@@ -1,66 +1,92 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📡 Geometric Agent Radar - Jawa Pos Radar Tulungagung
+### Tactical Geospatial Surveillance System (Biro Mataraman: Tulungagung • Blitar • Trenggalek)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Radar Tulungagung](https://img.shields.io/badge/Radar-Tulungagung%20(Jawa%20Pos)-004B87?style=for-the-badge)
+![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?style=for-the-badge&logo=laravel)
+![Leaflet.js](https://img.shields.io/badge/Leaflet.js-1.9.4-199900?style=for-the-badge&logo=leaflet)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Ringkasan Proyek
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Geometric Agent Radar** adalah platform pemantauan intelijen geografis (*geospatial surveillance radar*) berbasis web yang dirancang khusus untuk operasional **Jawa Pos Radar Tulungagung** di 3 wilayah Mataraman Jawa Timur:
+1. 🔵 **Kabupaten Tulungagung** (Warna Identitas: **Biru** `#004B87`)
+2. 🔴 **Kabupaten & Kota Blitar** (Warna Identitas: **Merah** `#D90429`)
+3. 🟡 **Kabupaten Trenggalek** (Warna Identitas: **Kuning** `#E5A900`)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🗺️ Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- 📍 **Hierarchical Geospatial Drill-Down**:
+  - **Level Wilayah (Kabupaten/Kota)**: Poligon batas administratif dan visualisasi landmark kantor utama Radar (*HQ Beacons*).
+  - **Level Kecamatan (Districts)**: Batas poligon dan pin label interaktif (27 kecamatan).
+  - **Level Desa (Villages)**: Titik desa/kelurahan dengan polygon highlight saat diklik.
+- 🏢 **3 Kantor Utama Radar (Landmark HQ)**:
+  - **Radar Tulungagung HQ**: Jl. I Gusti Ngurah Rai No. 34 / Jayeng Kusuma, Bago (`[-8.0645, 111.9025]`)
+  - **Radar Blitar HQ**: Jl. Mastrip No. 12 / Kenanga, Kepanjenkidul (`[-8.0983, 112.1681]`)
+  - **Radar Trenggalek HQ**: Jl. Brigjen Soetran No. 05, Trenggalek (`[-8.0506, 111.7145]`)
+- 👥 **27 Agen Lapangan Terdistribusi**:
+  - Penamaan otentik Indonesia dengan status operasional (*Active, Patrol, Alert, Standby*).
+  - Spesialisasi peran (*Tactical Lead, Field Reporter, Scout Drone, Investigative Recon, Traffic Patrol*).
+- 🗂️ **Sistem Isolasi Area Agen**:
+  - Filter interaktif berdasarkan wilayah yang mengisolasi marker agen kota lain.
+- 📱 **Modal Detail Agen Responsif**:
+  - Profil agen, indikator kekuatan sinyal real-time, koordinat GPS presisi, kontak telepon langsung, dan deskripsi tugas.
+- 🎨 **Tema Visual Khas Radar Tulungagung**:
+  - Desain antarmuka modern *Blue-White Clean Slate* dengan tipografi Inter, Plus Jakarta Sans, dan JetBrains Mono.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🚀 Panduan Instalasi & Menjalankan Aplikasi
 
-## Laravel Sponsors
+### 1. Kebutuhan Sistem
+- PHP >= 8.1
+- Composer
+- Node.js & NPM
+- MySQL / MariaDB (XAMPP)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### 2. Langkah Setup
+```bash
+# 1. Clone repository & masuk ke direktori
+git clone https://github.com/GalihMoya/geometric-agent-radar.git
+cd "Geometric Agent Radar"
 
-### Premium Partners
+# 2. Install dependencies PHP & Node
+composer install
+npm install
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+# 3. Konfigurasi Environment (.env)
+cp .env.example .env
+php artisan key:generate
 
-## Contributing
+# 4. Migrasi Database & Seeding Agen Mataraman
+php artisan migrate:fresh --seed
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 5. Build Asset Frontend (Vite)
+npm run build
 
-## Code of Conduct
+# 6. Jalankan Server Lokal
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Akses aplikasi pada browser di `http://127.0.0.1:8000`.
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🧪 Menjalankan Automated Tests
 
-## License
+Aplikasi dilengkapi dengan rangkaian automated test menggunakan PHPUnit:
+```bash
+php artisan test
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 📂 Struktur Data Geografis (GeoJSON)
+File spasial tersimpan di folder `public/data/geojson/`:
+- `mataraman_regions.json` - Batas kabupaten Tulungagung, Blitar, Trenggalek
+- `districts.json` - Poligon dan titik pusat 27 kecamatan
+- `villages.json` - Titik desa/kelurahan sampel untuk drill-down
+- `radar_hq.json` - Koordinat dan metadata 3 kantor pusat Radar
