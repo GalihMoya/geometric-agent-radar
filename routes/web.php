@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AgentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-use App\Http\Controllers\AgentController;
-
 Route::get('/', [AgentController::class, 'index'])->name('radar.index');
 Route::get('/api/agents', [AgentController::class, 'getAgents'])->name('api.agents');
+Route::get('/api/hq', [AgentController::class, 'getHqLocations'])->name('api.hq');

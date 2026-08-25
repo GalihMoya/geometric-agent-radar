@@ -12,11 +12,15 @@ class Agent extends Model
     protected $fillable = [
         'code',
         'name',
+        'city',
+        'district',
+        'village',
         'type',
         'status',
         'latitude',
         'longitude',
         'signal_strength',
+        'phone',
         'description',
     ];
 
@@ -25,4 +29,37 @@ class Agent extends Model
         'longitude' => 'float',
         'signal_strength' => 'integer',
     ];
+
+    /**
+     * Scope query to specific city
+     */
+    public function scopeByCity($query, ?string $city)
+    {
+        if ($city && $city !== 'all') {
+            return $query->where('city', strtolower($city));
+        }
+        return $query;
+    }
+
+    /**
+     * Scope query to specific status
+     */
+    public function scopeByStatus($query, ?string $status)
+    {
+        if ($status && $status !== 'all') {
+            return $query->where('status', strtolower($status));
+        }
+        return $query;
+    }
+
+    /**
+     * Scope query to specific type
+     */
+    public function scopeByType($query, ?string $type)
+    {
+        if ($type && $type !== 'all') {
+            return $query->where('type', $type);
+        }
+        return $query;
+    }
 }

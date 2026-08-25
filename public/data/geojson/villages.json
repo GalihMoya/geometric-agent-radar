@@ -1,0 +1,317 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-ta-kampungdalem",
+        "name": "Kelurahan Kampungdalem",
+        "district": "Tulungagung Kota",
+        "district_id": "ta-tulungagung",
+        "city": "tulungagung",
+        "color": "#004B87",
+        "description": "Pusat Alun-Alun dan Kantor Bupati Tulungagung."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.898, -8.062],
+            [111.906, -8.062],
+            [111.906, -8.068],
+            [111.898, -8.068],
+            [111.898, -8.062]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-ta-bago",
+        "name": "Kelurahan Bago",
+        "district": "Tulungagung Kota",
+        "district_id": "ta-tulungagung",
+        "city": "tulungagung",
+        "color": "#004B87",
+        "description": "Lokasi Kantor Pusat Radar Tulungagung dan Stasiun Tulungagung."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.900, -8.061],
+            [111.912, -8.061],
+            [111.912, -8.072],
+            [111.900, -8.072],
+            [111.900, -8.061]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-ta-serut",
+        "name": "Desa Serut",
+        "district": "Boyolangu",
+        "district_id": "ta-boyolangu",
+        "city": "tulungagung",
+        "color": "#004B87",
+        "description": "Kawasan Candi Gayatri dan lingkungan permukiman terpadu."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.890, -8.110],
+            [111.906, -8.110],
+            [111.906, -8.125],
+            [111.890, -8.125],
+            [111.890, -8.110]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-ta-rejoagung",
+        "name": "Desa Rejoagung",
+        "district": "Kedungwaru",
+        "district_id": "ta-kedungwaru",
+        "city": "tulungagung",
+        "color": "#004B87",
+        "description": "Stadion Rejoagung dan simpul jalan provinsi arah Kediri."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.915, -8.040],
+            [111.930, -8.040],
+            [111.930, -8.055],
+            [111.915, -8.055],
+            [111.915, -8.040]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-ta-gamping",
+        "name": "Desa Gamping",
+        "district": "Campurdarat",
+        "district_id": "ta-campurdarat",
+        "city": "tulungagung",
+        "color": "#004B87",
+        "description": "Pusat galeri seni ukir patung batu marmer Campurdarat."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.845, -8.165],
+            [111.865, -8.165],
+            [111.865, -8.182],
+            [111.845, -8.182],
+            [111.845, -8.165]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-ta-besole",
+        "name": "Desa Besole",
+        "district": "Besuki",
+        "district_id": "ta-besuki",
+        "city": "tulungagung",
+        "color": "#004B87",
+        "description": "Pesisir Teluk Popoh dan dermaga nelayan tradisional."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.770, -8.235],
+            [111.795, -8.235],
+            [111.795, -8.258],
+            [111.770, -8.258],
+            [111.770, -8.235]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-bl-bendo",
+        "name": "Kelurahan Bendo",
+        "district": "Kepanjenkidul",
+        "district_id": "bl-kepanjenkidul",
+        "city": "blitar",
+        "color": "#D90429",
+        "description": "Kawasan Makam Bung Karno dan Museum Kepustakaan Proklamator."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.155, -8.085],
+            [112.170, -8.085],
+            [112.170, -8.099],
+            [112.155, -8.099],
+            [112.155, -8.085]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-bl-bendogerit",
+        "name": "Kelurahan Bendogerit",
+        "district": "Sananwetan",
+        "district_id": "bl-sananwetan",
+        "city": "blitar",
+        "color": "#D90429",
+        "description": "Monumen Potlot PETA dan Istana Gebang kediaman Bung Karno."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.172, -8.095],
+            [112.190, -8.095],
+            [112.190, -8.110],
+            [112.172, -8.110],
+            [112.172, -8.095]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-bl-pakunden",
+        "name": "Kelurahan Pakunden",
+        "district": "Sukorejo",
+        "district_id": "bl-sukorejo",
+        "city": "blitar",
+        "color": "#D90429",
+        "description": "Kawasan perdagangan Pasar Legi dan perlintasan rel KA."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.140, -8.098],
+            [112.155, -8.098],
+            [112.155, -8.115],
+            [112.140, -8.115],
+            [112.140, -8.098]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-bl-satreyan",
+        "name": "Kelurahan Satreyan",
+        "district": "Kanigoro",
+        "district_id": "bl-kanigoro",
+        "city": "blitar",
+        "color": "#D90429",
+        "description": "Pusat Kantor Bupati dan Sekretariat Daerah Kabupaten Blitar."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.210, -8.125],
+            [112.228, -8.125],
+            [112.228, -8.140],
+            [112.210, -8.140],
+            [112.210, -8.125]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-tg-surodakan",
+        "name": "Kelurahan Surodakan",
+        "district": "Trenggalek Kota",
+        "district_id": "tg-trenggalek",
+        "city": "trenggalek",
+        "color": "#E5A900",
+        "description": "Pendopo Kabupaten Manggala Praja Nugraha dan Alun-Alun Trenggalek."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.705, -8.048],
+            [111.720, -8.048],
+            [111.720, -8.062],
+            [111.705, -8.062],
+            [111.705, -8.048]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-tg-tasikmadu",
+        "name": "Desa Tasikmadu",
+        "district": "Watulimo",
+        "district_id": "tg-watulimo",
+        "city": "trenggalek",
+        "color": "#E5A900",
+        "description": "Pelabuhan Perikanan Nusantara Prigi dan sentra pelelangan ikan."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.720, -8.255],
+            [111.740, -8.255],
+            [111.740, -8.275],
+            [111.720, -8.275],
+            [111.720, -8.255]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "vil-tg-semen",
+        "name": "Desa Semen",
+        "district": "Durenan",
+        "district_id": "tg-durenan",
+        "city": "trenggalek",
+        "color": "#E5A900",
+        "description": "Pusat perayaan Kupatan Durenan dan pasar tradisional perbatasan."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.782, -8.085],
+            [111.802, -8.085],
+            [111.802, -8.102],
+            [111.782, -8.102],
+            [111.782, -8.085]
+          ]
+        ]
+      }
+    }
+  ]
+}

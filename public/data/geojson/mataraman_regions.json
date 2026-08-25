@@ -1,0 +1,120 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tulungagung",
+        "name": "Kabupaten Tulungagung",
+        "code": "TA",
+        "center": [-8.0645, 111.9025],
+        "color": "#004B87",
+        "borderColor": "#0073E6",
+        "fillColor": "rgba(0, 75, 135, 0.25)",
+        "hq": "Kantor Radar Tulungagung",
+        "hq_address": "Jl. I Gusti Ngurah Rai No. 34, Bago, Kec. Tulungagung",
+        "hq_coords": [-8.0645, 111.9025],
+        "districts_count": 19
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.7800, -7.9200],
+            [111.8500, -7.9300],
+            [111.9200, -7.9600],
+            [111.9800, -8.0100],
+            [112.0400, -8.0500],
+            [112.0800, -8.1100],
+            [112.0600, -8.1800],
+            [112.0200, -8.2400],
+            [111.9600, -8.2900],
+            [111.8800, -8.3200],
+            [111.8000, -8.3100],
+            [111.7500, -8.2600],
+            [111.7600, -8.1700],
+            [111.7800, -8.0800],
+            [111.7500, -8.0000],
+            [111.7800, -7.9200]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "blitar",
+        "name": "Kabupaten & Kota Blitar",
+        "code": "BL",
+        "center": [-8.0983, 112.1681],
+        "color": "#D90429",
+        "borderColor": "#EF233C",
+        "fillColor": "rgba(217, 4, 41, 0.25)",
+        "hq": "Kantor Radar Blitar",
+        "hq_address": "Jl. Mastrip No. 12, Kepanjenkidul, Kota Blitar",
+        "hq_coords": [-8.0983, 112.1681],
+        "districts_count": 22
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.0400, -8.0500],
+            [112.1200, -7.9300],
+            [112.2200, -7.9000],
+            [112.3300, -7.9300],
+            [112.4400, -8.0200],
+            [112.4600, -8.1200],
+            [112.4200, -8.2200],
+            [112.3800, -8.3200],
+            [112.2800, -8.3600],
+            [112.1600, -8.3500],
+            [112.0500, -8.2800],
+            [112.0200, -8.2400],
+            [112.0600, -8.1800],
+            [112.0800, -8.1100],
+            [112.0400, -8.0500]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "trenggalek",
+        "name": "Kabupaten Trenggalek",
+        "code": "TG",
+        "center": [-8.0506, 111.7145],
+        "color": "#E5A900",
+        "borderColor": "#FFC107",
+        "fillColor": "rgba(229, 169, 0, 0.25)",
+        "hq": "Kantor Radar Trenggalek",
+        "hq_address": "Jl. Brigjen Soetran No. 05, Trenggalek",
+        "hq_coords": [-8.0506, 111.7145],
+        "districts_count": 14
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.7800, -7.9200],
+            [111.7500, -8.0000],
+            [111.7800, -8.0800],
+            [111.7600, -8.1700],
+            [111.7500, -8.2600],
+            [111.8000, -8.3100],
+            [111.7200, -8.3800],
+            [111.5800, -8.3700],
+            [111.4500, -8.3200],
+            [111.3800, -8.2400],
+            [111.4400, -8.1200],
+            [111.5200, -8.0200],
+            [111.6000, -7.9200],
+            [111.7000, -7.8800],
+            [111.7800, -7.9200]
+          ]
+        ]
+      }
+    }
+  ]
+}

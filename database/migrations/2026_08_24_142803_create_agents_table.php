@@ -15,11 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
-            $table->string('type')->default('Scout');
+            $table->enum('city', ['tulungagung', 'blitar', 'trenggalek'])->default('tulungagung');
+            $table->string('district')->nullable();
+            $table->string('village')->nullable();
+            $table->string('type')->default('Field Reporter');
             $table->enum('status', ['active', 'patrol', 'alert', 'standby'])->default('active');
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
             $table->integer('signal_strength')->default(100);
+            $table->string('phone')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

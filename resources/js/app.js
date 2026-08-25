@@ -1,5 +1,6 @@
 import './bootstrap';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 import L from 'leaflet';
 import 'leaflet.markercluster';
 
@@ -11,58 +12,414 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// App State
+// App Global State
 let map = null;
-let markerClusterGroup = null;
+let hqLayerGroup = null;
+let regionBoundaryLayer = null;
+let districtLayerGroup = null;
+let villageLayerGroup = null;
+let agentClusterGroup = null;
+
 let agentMarkersMap = {};
 let currentAgents = [];
+let currentCityFilter = 'all';
+let rawGeoJsonRegions = null;
+let rawGeoJsonDistricts = null;
+let rawGeoJsonVillages = null;
+let rawHqData = [];
 
-document.addEventListener('DOMContentLoaded', () => {
+// Mataraman Map Defaults
+const MATARAMAN_CENTER = [-8.1000, 111.9500];
+const MATARAMAN_ZOOM = 10;
+
+// Color Dictionary
+const REGION_COLORS = {
+    tulungagung: {
+        primary: '#004B87',
+        light: '#0073E6',
+        fill: 'rgba(0, 75, 135, 0.18)',
+        border: '#0073E6',
+        name: 'Kabupaten Tulungagung',
+    },
+    blitar: {
+        primary: '#D90429',
+        light: '#EF233C',
+        fill: 'rgba(217, 4, 41, 0.18)',
+        border: '#EF233C',
+        name: 'Kabupaten & Kota Blitar',
+    },
+    trenggalek: {
+        primary: '#E5A900',
+        light: '#FFC107',
+        fill: 'rgba(229, 169, 0, 0.18)',
+        border: '#FFC107',
+        name: 'Kabupaten Trenggalek',
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
     initMap();
     initEventListeners();
-    fetchAgents();
+    await loadSpatialData();
+    await fetchAgents();
 });
 
 /**
- * Initialize Leaflet Map
+ * Initialize Leaflet Map with layers and controls
  */
 function initMap() {
     const mapElement = document.getElementById('radar-map');
     if (!mapElement) return;
 
-    // Center map initially around Indonesia (default view)
+    // Center map on Mataraman (Tulungagung, Blitar, Trenggalek)
     map = L.map('radar-map', {
-        center: [-2.548926, 118.0148634],
-        zoom: 5,
+        center: MATARAMAN_CENTER,
+        zoom: MATARAMAN_ZOOM,
+        minZoom: 8,
+        maxZoom: 18,
         zoomControl: false,
         attributionControl: false,
     });
 
-    // Custom dark theme tile layer
-    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Clean modern tile layer (CartoDB Positron / OSM Voyager)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
-        className: 'radar-map-tiles',
+        subdomains: 'abcd',
+        attribution: '&copy; <a href="https://carto.com/">CARTO</a> | Radar Tulungagung'
     }).addTo(map);
 
     // Zoom control at bottom right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Add attribution at bottom right
-    L.control.attribution({ position: 'bottomright', prefix: 'Geometric Agent Radar | Leaflet' }).addTo(map);
+    // Initialize Layer Groups
+    regionBoundaryLayer = L.geoJSON(null, {
+        style: styleRegionFeature,
+        onEachFeature: onEachRegionFeature
+    }).addTo(map);
 
-    // Initialize Marker Cluster Group
-    markerClusterGroup = L.markerClusterGroup({
+    districtLayerGroup = L.layerGroup().addTo(map);
+    villageLayerGroup = L.layerGroup().addTo(map);
+    hqLayerGroup = L.layerGroup().addTo(map);
+
+    // Marker cluster group for agents
+    agentClusterGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
         zoomToBoundsOnClick: true,
         spiderfyOnMaxZoom: true,
-        maxClusterRadius: 45,
+        maxClusterRadius: 40,
+        iconCreateFunction: createClusterIcon
     });
+    map.addLayer(agentClusterGroup);
 
-    map.addLayer(markerClusterGroup);
+    // Adaptive zoom level listener
+    map.on('zoomend', handleMapZoomLevels);
 }
 
 /**
- * Fetch agents via Axios
+ * Custom Cluster Icon per city dominance
+ */
+function createClusterIcon(cluster) {
+    const childMarkers = cluster.getAllChildMarkers();
+    let cityCounts = { tulungagung: 0, blitar: 0, trenggalek: 0 };
+
+    childMarkers.forEach(m => {
+        const city = m.agentData?.city || 'tulungagung';
+        cityCounts[city] = (cityCounts[city] || 0) + 1;
+    });
+
+    let dominantCity = 'tulungagung';
+    if (cityCounts.blitar > cityCounts.tulungagung && cityCounts.blitar > cityCounts.trenggalek) {
+        dominantCity = 'blitar';
+    } else if (cityCounts.trenggalek > cityCounts.tulungagung && cityCounts.trenggalek > cityCounts.blitar) {
+        dominantCity = 'trenggalek';
+    }
+
+    return L.divIcon({
+        html: `<div><span>${cluster.getChildCount()}</span></div>`,
+        className: `marker-cluster marker-cluster-${dominantCity}`,
+        iconSize: L.point(40, 40)
+    });
+}
+
+/**
+ * Load Spatial Data (GeoJSON and HQ endpoints)
+ */
+async function loadSpatialData() {
+    try {
+        // Load Regions GeoJSON
+        try {
+            const resRegions = await window.axios.get('/data/geojson/mataraman_regions.json');
+            rawGeoJsonRegions = resRegions.data;
+            if (rawGeoJsonRegions) {
+                regionBoundaryLayer.addData(rawGeoJsonRegions);
+            }
+        } catch (e) {
+            console.warn('Could not load mataraman_regions.json, using fallback');
+        }
+
+        // Load Districts GeoJSON
+        try {
+            const resDistricts = await window.axios.get('/data/geojson/districts.json');
+            rawGeoJsonDistricts = resDistricts.data;
+            renderDistricts(rawGeoJsonDistricts);
+        } catch (e) {
+            console.warn('Could not load districts.json');
+        }
+
+        // Load Villages GeoJSON
+        try {
+            const resVillages = await window.axios.get('/data/geojson/villages.json');
+            rawGeoJsonVillages = resVillages.data;
+            renderVillages(rawGeoJsonVillages);
+        } catch (e) {
+            console.warn('Could not load villages.json');
+        }
+
+        // Load HQ Locations
+        try {
+            const resHq = await window.axios.get('/api/hq');
+            if (resHq.data && resHq.data.success) {
+                rawHqData = resHq.data.data;
+                renderHqMarkers(rawHqData);
+            }
+        } catch (e) {
+            console.warn('Could not load /api/hq');
+        }
+
+    } catch (err) {
+        console.error('Error loading spatial data:', err);
+    }
+}
+
+/**
+ * Style Region Boundary Feature
+ */
+function styleRegionFeature(feature) {
+    const cityId = feature.properties.id;
+    const colorInfo = REGION_COLORS[cityId] || REGION_COLORS.tulungagung;
+
+    return {
+        fillColor: colorInfo.fill,
+        weight: 3,
+        opacity: 0.9,
+        color: colorInfo.border,
+        dashArray: '4, 4',
+        fillOpacity: 0.25
+    };
+}
+
+/**
+ * Region onEachFeature behavior
+ */
+function onEachRegionFeature(feature, layer) {
+    const props = feature.properties;
+    const colorInfo = REGION_COLORS[props.id] || REGION_COLORS.tulungagung;
+
+    layer.bindTooltip(`
+        <div class="fw-bold" style="color: ${colorInfo.primary};">
+            <i class="bi bi-geo-alt-fill"></i> ${props.name}
+        </div>
+        <small class="text-muted">Klik untuk zoom wilayah</small>
+    `, { sticky: true, className: 'map-hud-overlay' });
+
+    layer.on({
+        mouseover: (e) => {
+            const l = e.target;
+            l.setStyle({
+                weight: 4,
+                fillOpacity: 0.4,
+                dashArray: ''
+            });
+        },
+        mouseout: (e) => {
+            regionBoundaryLayer.resetStyle(e.target);
+        },
+        click: (e) => {
+            map.fitBounds(e.target.getBounds().pad(0.08));
+        }
+    });
+}
+
+/**
+ * Render Districts Layer
+ */
+function renderDistricts(geoJsonData) {
+    if (!geoJsonData || !geoJsonData.features) return;
+    districtLayerGroup.clearLayers();
+
+    geoJsonData.features.forEach(feature => {
+        const props = feature.properties;
+        const cityId = props.city || 'tulungagung';
+        const colorInfo = REGION_COLORS[cityId] || REGION_COLORS.tulungagung;
+
+        // Polygon
+        const polygon = L.geoJSON(feature, {
+            style: {
+                fillColor: colorInfo.light,
+                weight: 1.5,
+                opacity: 0.8,
+                color: colorInfo.border,
+                fillOpacity: 0.08
+            }
+        });
+
+        // Interactive popup & hover
+        polygon.bindTooltip(`<strong>${props.name}</strong><br><small>${props.villages_count || 12} Desa/Kelurahan</small>`, {
+            className: `district-map-label district-map-label-${cityId}`,
+            permanent: false,
+            direction: 'center'
+        });
+
+        polygon.on('click', () => {
+            map.flyTo(props.center, 13, { duration: 1.2 });
+            showVillagesInDistrict(props.id);
+        });
+
+        districtLayerGroup.addLayer(polygon);
+
+        // Center Marker Icon with label
+        const districtMarkerIcon = L.divIcon({
+            className: 'district-marker-pin',
+            html: `
+                <div class="district-map-label district-map-label-${cityId} text-nowrap">
+                    <i class="bi bi-pin-map-fill"></i> ${props.name.replace('Kecamatan ', '')}
+                </div>
+            `,
+            iconSize: [120, 24],
+            iconAnchor: [60, 12]
+        });
+
+        const centerMarker = L.marker(props.center, { icon: districtMarkerIcon });
+        centerMarker.on('click', () => {
+            map.flyTo(props.center, 13, { duration: 1.2 });
+            showVillagesInDistrict(props.id);
+        });
+
+        districtLayerGroup.addLayer(centerMarker);
+    });
+}
+
+/**
+ * Render Villages Layer
+ */
+function renderVillages(geoJsonData) {
+    if (!geoJsonData || !geoJsonData.features) return;
+    villageLayerGroup.clearLayers();
+
+    geoJsonData.features.forEach(feature => {
+        const props = feature.properties;
+        const cityId = props.city || 'tulungagung';
+        const colorInfo = REGION_COLORS[cityId] || REGION_COLORS.tulungagung;
+
+        const polygon = L.geoJSON(feature, {
+            style: {
+                fillColor: colorInfo.light,
+                weight: 1.5,
+                opacity: 0.9,
+                color: colorInfo.primary,
+                fillOpacity: 0.25
+            }
+        });
+
+        polygon.bindTooltip(`<strong>${props.name}</strong> (${props.district})`, {
+            className: 'village-map-label',
+            sticky: true
+        });
+
+        polygon.on('click', () => {
+            map.fitBounds(polygon.getBounds().pad(0.2));
+        });
+
+        villageLayerGroup.addLayer(polygon);
+    });
+}
+
+/**
+ * Zoom into district and highlight relevant villages
+ */
+function showVillagesInDistrict(districtId) {
+    if (!rawGeoJsonVillages) return;
+
+    const matchingVillages = rawGeoJsonVillages.features.filter(f => f.properties.district_id === districtId);
+    if (matchingVillages.length > 0) {
+        const tempGroup = L.featureGroup(matchingVillages.map(f => L.geoJSON(f)));
+        map.fitBounds(tempGroup.getBounds().pad(0.3));
+    }
+}
+
+/**
+ * Render 3 Radar Headquarters (HQ) Landmarks
+ */
+function renderHqMarkers(hqs) {
+    if (!hqLayerGroup) return;
+    hqLayerGroup.clearLayers();
+
+    hqs.forEach(hq => {
+        const customIcon = L.divIcon({
+            className: 'radar-hq-marker-container',
+            html: `
+                <div class="radar-hq-marker-wrap ${hq.marker_class}">
+                    <div class="radar-hq-pulse"></div>
+                    <div class="radar-hq-pulse-2"></div>
+                    <div class="radar-hq-beacon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                </div>
+            `,
+            iconSize: [60, 60],
+            iconAnchor: [30, 30],
+            popupAnchor: [0, -25]
+        });
+
+        const marker = L.marker([hq.latitude, hq.longitude], { icon: customIcon });
+
+        marker.on('click', () => {
+            openHqDetailModal(hq);
+        });
+
+        marker.bindTooltip(`
+            <div class="p-1 text-center font-heading">
+                <span class="badge ${hq.city === 'tulungagung' ? 'bg-primary' : hq.city === 'blitar' ? 'bg-danger' : 'bg-warning text-dark'} mb-1">HQ RADAR</span>
+                <div class="fw-bold">${hq.name}</div>
+                <small class="text-muted">${hq.address}</small>
+            </div>
+        `, { direction: 'top', offset: [0, -20] });
+
+        hqLayerGroup.addLayer(marker);
+    });
+}
+
+/**
+ * Open HQ Detail Modal
+ */
+function openHqDetailModal(hq) {
+    const modalEl = document.getElementById('hqDetailModal');
+    if (!modalEl) return;
+
+    document.getElementById('modal-hq-name').textContent = hq.name;
+    document.getElementById('modal-hq-city-badge').textContent = `Biro ${hq.city_label}`;
+    document.getElementById('modal-hq-address').textContent = hq.address;
+    document.getElementById('modal-hq-phone').textContent = hq.phone;
+    document.getElementById('modal-hq-personnel').textContent = `${hq.personnel} Agen Lapangan`;
+    document.getElementById('modal-hq-desc').textContent = hq.description;
+
+    const headerBg = document.getElementById('modal-hq-header-bg');
+    if (headerBg) {
+        if (hq.city === 'tulungagung') {
+            headerBg.style.background = 'linear-gradient(135deg, #002244 0%, #004B87 100%)';
+        } else if (hq.city === 'blitar') {
+            headerBg.style.background = 'linear-gradient(135deg, #7A0012 0%, #D90429 100%)';
+        } else {
+            headerBg.style.background = 'linear-gradient(135deg, #8A6400 0%, #E5A900 100%)';
+        }
+    }
+
+    const modal = new window.bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+/**
+ * Fetch field agents via Axios
  */
 async function fetchAgents() {
     const statusFilter = document.getElementById('filter-status')?.value || 'all';
@@ -74,6 +431,7 @@ async function fetchAgents() {
     try {
         const response = await window.axios.get('/api/agents', {
             params: {
+                city: currentCityFilter,
                 status: statusFilter,
                 type: typeFilter,
                 search: searchFilter,
@@ -83,11 +441,11 @@ async function fetchAgents() {
         if (response.data && response.data.success) {
             currentAgents = response.data.data;
             updateStatsUI(response.data.stats);
-            renderMarkers(currentAgents);
+            renderAgentMarkers(currentAgents);
             renderAgentList(currentAgents);
         }
     } catch (error) {
-        console.error('Error fetching agent data:', error);
+        console.error('Error fetching agents:', error);
     } finally {
         showLoadingState(false);
     }
@@ -100,79 +458,79 @@ function updateStatsUI(stats) {
     if (!stats) return;
 
     const totalEl = document.getElementById('stat-total-val');
-    const activeEl = document.getElementById('stat-active-val');
-    const patrolEl = document.getElementById('stat-patrol-val');
-    const alertEl = document.getElementById('stat-alert-val');
-    const standbyEl = document.getElementById('stat-standby-val');
+    const taEl = document.getElementById('stat-ta-val');
+    const blEl = document.getElementById('stat-bl-val');
+    const tgEl = document.getElementById('stat-tg-val');
+    const dutyEl = document.getElementById('stat-duty-val');
     const signalEl = document.getElementById('stat-signal-val');
+    const badgeEl = document.getElementById('agent-count-badge');
 
     if (totalEl) totalEl.textContent = stats.total ?? 0;
-    if (activeEl) activeEl.textContent = stats.active ?? 0;
-    if (patrolEl) patrolEl.textContent = stats.patrol ?? 0;
-    if (alertEl) alertEl.textContent = stats.alert ?? 0;
-    if (standbyEl) standbyEl.textContent = stats.standby ?? 0;
+    if (taEl) taEl.textContent = stats.cities?.tulungagung ?? 0;
+    if (blEl) blEl.textContent = stats.cities?.blitar ?? 0;
+    if (tgEl) tgEl.textContent = stats.cities?.trenggalek ?? 0;
+    if (dutyEl) dutyEl.textContent = (stats.active || 0) + (stats.patrol || 0);
     if (signalEl) signalEl.textContent = (stats.avg_signal ?? 0) + '%';
+    if (badgeEl) badgeEl.textContent = `${stats.total ?? 0} Agen`;
 }
 
 /**
- * Render Leaflet Markers with MarkerCluster
+ * Render Agent Markers on Map with Region Colors & Isolation
  */
-function renderMarkers(agents) {
-    if (!markerClusterGroup) return;
+function renderAgentMarkers(agents) {
+    if (!agentClusterGroup) return;
 
-    markerClusterGroup.clearLayers();
+    agentClusterGroup.clearLayers();
     agentMarkersMap = {};
 
     agents.forEach(agent => {
-        const markerColorClass = getStatusColorClass(agent.status);
+        // Enforce boundary isolation: Skip agent if city filter does not match
+        if (currentCityFilter !== 'all' && agent.city !== currentCityFilter) {
+            return;
+        }
+
+        const cityClass = `agent-marker-${agent.city}`;
         
-        // Custom HTML Marker with glowing pulse ring
+        // Custom HTML Marker with pulsating wave ring
         const customIcon = L.divIcon({
-            className: 'agent-radar-marker-container',
+            className: 'radar-agent-marker-container',
             html: `
-                <div class="agent-radar-marker ${markerColorClass}">
-                    <div class="agent-radar-ring"></div>
-                    <div class="agent-radar-dot" style="background-color: currentColor;"></div>
+                <div class="radar-agent-marker-wrap ${cityClass}" data-agent-id="${agent.id}">
+                    <div class="radar-agent-wave"></div>
+                    <div class="radar-agent-dot"></div>
                 </div>
             `,
-            iconSize: [36, 36],
-            iconAnchor: [18, 18],
-            popupAnchor: [0, -18],
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            popupAnchor: [0, -14],
         });
 
         const marker = L.marker([agent.latitude, agent.longitude], { icon: customIcon });
+        marker.agentData = agent;
 
-        // Popup HTML Template
-        const popupContent = `
+        // Click Marker: Open Agent Detail Modal
+        marker.on('click', () => {
+            openAgentDetailModal(agent);
+        });
+
+        // Hover tooltip
+        marker.bindTooltip(`
             <div class="p-1">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="badge bg-dark border font-mono text-cyan">${agent.code}</span>
-                    <span class="badge bg-status-${agent.status} text-uppercase font-mono">${agent.status}</span>
-                </div>
-                <h6 class="fw-bold mb-1 text-white font-orbitron" style="font-size: 0.95rem;">${agent.name}</h6>
-                <p class="text-muted small mb-2">${agent.description || 'No description available.'}</p>
-                <hr class="my-2 border-secondary" style="opacity: 0.3;">
-                <div class="row g-1 small font-mono">
-                    <div class="col-6 text-muted">Type:</div>
-                    <div class="col-6 text-end text-light fw-bold">${agent.type}</div>
-                    <div class="col-6 text-muted">Coordinates:</div>
-                    <div class="col-6 text-end text-light">${agent.latitude.toFixed(4)}, ${agent.longitude.toFixed(4)}</div>
-                    <div class="col-6 text-muted">Signal:</div>
-                    <div class="col-6 text-end text-success fw-bold">${agent.signal_strength}%</div>
-                </div>
+                <span class="badge badge-city-${agent.city} mb-1">${agent.city.toUpperCase()}</span>
+                <div class="fw-bold font-heading">${agent.name}</div>
+                <small class="text-muted font-mono">${agent.code} • ${agent.district || 'Pos Lapangan'}</small>
             </div>
-        `;
+        `, { direction: 'top', offset: [0, -12] });
 
-        marker.bindPopup(popupContent);
-        markerClusterGroup.addLayer(marker);
+        agentClusterGroup.addLayer(marker);
         agentMarkersMap[agent.id] = marker;
     });
 
-    // If agents exist, fit bounds to show all markers smoothly
-    if (agents.length > 0) {
-        const bounds = markerClusterGroup.getBounds();
+    // Auto fit bounds when filtering if markers exist
+    if (agents.length > 0 && currentCityFilter !== 'all') {
+        const bounds = agentClusterGroup.getBounds();
         if (bounds.isValid()) {
-            map.fitBounds(bounds.pad(0.1));
+            map.fitBounds(bounds.pad(0.15));
         }
     }
 }
@@ -186,123 +544,240 @@ function renderAgentList(agents) {
 
     if (agents.length === 0) {
         listContainer.innerHTML = `
-            <div class="text-center text-muted py-4">
-                <i class="bi bi-radar display-6 d-block mb-2 text-secondary"></i>
-                <span class="small font-mono">NO ACTIVE AGENTS FOUND</span>
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-radar display-5 d-block mb-2 text-secondary opacity-50"></i>
+                <div class="fw-bold font-heading small">TIDAK ADA AGEN DITEMUKAN</div>
+                <small class="font-mono text-muted">Sesuaikan filter wilayah atau kata kunci</small>
             </div>
         `;
         return;
     }
 
-    listContainer.innerHTML = agents.map(agent => `
-        <div class="agent-list-item" data-agent-id="${agent.id}">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <span class="badge bg-dark border font-mono text-cyan" style="font-size: 0.75rem;">${agent.code}</span>
-                <span class="badge bg-status-${agent.status} text-uppercase font-mono" style="font-size: 0.7rem;">${agent.status}</span>
+    listContainer.innerHTML = agents.map(agent => {
+        const cityLabel = agent.city.charAt(0).toUpperCase() + agent.city.slice(1);
+        return `
+            <div class="agent-card-item" data-agent-id="${agent.id}" data-city="${agent.city}">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge badge-city-${agent.city} font-mono" style="font-size: 0.72rem;">${agent.code}</span>
+                    <span class="badge badge-status-${agent.status} text-uppercase font-mono" style="font-size: 0.68rem;">${agent.status}</span>
+                </div>
+                <div class="fw-bold text-dark font-heading small mb-1">${agent.name}</div>
+                <div class="d-flex justify-content-between text-muted" style="font-size: 0.73rem;">
+                    <span><i class="bi bi-geo-alt me-1"></i>${agent.district || cityLabel}</span>
+                    <span class="text-success font-mono"><i class="bi bi-broadcast"></i> ${agent.signal_strength}%</span>
+                </div>
+                <div class="text-muted mt-1" style="font-size: 0.7rem;">
+                    <i class="bi bi-shield-check me-1"></i>${agent.type}
+                </div>
             </div>
-            <div class="fw-semibold text-white small">${agent.name}</div>
-            <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
-                <span>${agent.type}</span>
-                <span class="text-success"><i class="bi bi-broadcast"></i> ${agent.signal_strength}%</span>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
-    // Attach click event to items
-    listContainer.querySelectorAll('.agent-list-item').forEach(item => {
+    // Attach click listener to list items
+    listContainer.querySelectorAll('.agent-card-item').forEach(item => {
         item.addEventListener('click', () => {
             const agentId = item.getAttribute('data-agent-id');
-            flyToAgent(agentId);
+            const agent = currentAgents.find(a => a.id == agentId);
+            if (agent) {
+                flyToAgent(agentId);
+                openAgentDetailModal(agent);
+            }
         });
     });
 }
 
 /**
- * Fly to specific agent on map and open popup
+ * Fly Map to Agent Location
  */
 function flyToAgent(agentId) {
     const marker = agentMarkersMap[agentId];
     if (marker && map) {
-        // Unselect previous
-        document.querySelectorAll('.agent-list-item').forEach(el => el.classList.remove('selected'));
-        const activeItem = document.querySelector(`.agent-list-item[data-agent-id="${agentId}"]`);
+        document.querySelectorAll('.agent-card-item').forEach(el => el.classList.remove('selected'));
+        const activeItem = document.querySelector(`.agent-card-item[data-agent-id="${agentId}"]`);
         if (activeItem) activeItem.classList.add('selected');
 
         const latLng = marker.getLatLng();
-        map.flyTo(latLng, 14, {
-            duration: 1.2
-        });
-
-        setTimeout(() => {
-            if (markerClusterGroup.hasLayer(marker)) {
-                marker.openPopup();
-            } else {
-                markerClusterGroup.zoomToShowLayer(marker, () => {
-                    marker.openPopup();
-                });
-            }
-        }, 1200);
+        map.flyTo(latLng, 14, { duration: 1.2 });
     }
 }
 
 /**
- * Helper to get status color class
+ * Open Agent Detail Modal with Complete Information
  */
-function getStatusColorClass(status) {
-    switch (status) {
-        case 'active': return 'status-active';
-        case 'patrol': return 'status-patrol';
-        case 'alert': return 'status-alert';
-        case 'standby': return 'status-standby';
-        default: return 'status-active';
+function openAgentDetailModal(agent) {
+    const modalEl = document.getElementById('agentDetailModal');
+    if (!modalEl) return;
+
+    // Fill Modal Data
+    const initials = agent.name.split(' ').map(n => n[0]).slice(0, 2).join('');
+    document.getElementById('modal-agent-avatar').textContent = initials;
+    document.getElementById('modal-agent-name').textContent = agent.name;
+    document.getElementById('modal-agent-code').textContent = agent.code;
+
+    const cityLabel = agent.city.charAt(0).toUpperCase() + agent.city.slice(1);
+    document.getElementById('modal-agent-city-badge').textContent = cityLabel;
+    document.getElementById('modal-agent-city-label').textContent = `Biro Radar ${cityLabel}`;
+    document.getElementById('modal-agent-district').textContent = agent.district || '-';
+    document.getElementById('modal-agent-village').textContent = agent.village || '-';
+    document.getElementById('modal-agent-type').textContent = agent.type || 'Field Reporter';
+
+    // Status
+    const statusEl = document.getElementById('modal-agent-status');
+    statusEl.className = `badge badge-status-${agent.status} text-uppercase font-mono mt-1`;
+    statusEl.textContent = agent.status;
+
+    // Signal
+    const signalVal = agent.signal_strength || 85;
+    document.getElementById('modal-agent-signal-text').textContent = `${signalVal}%`;
+    const signalBar = document.getElementById('modal-agent-signal-bar');
+    signalBar.style.width = `${signalVal}%`;
+    signalBar.className = `progress-bar ${signalVal > 80 ? 'bg-success' : signalVal > 50 ? 'bg-warning' : 'bg-danger'}`;
+
+    // Coordinates & Phone
+    document.getElementById('modal-agent-coords').textContent = `${agent.latitude.toFixed(4)}, ${agent.longitude.toFixed(4)}`;
+    document.getElementById('modal-agent-phone').textContent = agent.phone || '0812-3456-7890';
+    const phoneLink = document.getElementById('modal-agent-phone-link');
+    if (phoneLink) {
+        phoneLink.href = `tel:${agent.phone || '081234567890'}`;
+    }
+
+    // Description
+    document.getElementById('modal-agent-desc').textContent = agent.description || 'Tidak ada deskripsi penugasan saat ini.';
+
+    // Dynamic Header Background Gradient per City
+    const headerBg = document.getElementById('modal-header-bg');
+    if (headerBg) {
+        if (agent.city === 'tulungagung') {
+            headerBg.style.background = 'linear-gradient(135deg, #002244 0%, #004B87 100%)';
+        } else if (agent.city === 'blitar') {
+            headerBg.style.background = 'linear-gradient(135deg, #7A0012 0%, #D90429 100%)';
+        } else {
+            headerBg.style.background = 'linear-gradient(135deg, #8A6400 0%, #E5A900 100%)';
+        }
+    }
+
+    // Locate Button inside Modal
+    const locateBtn = document.getElementById('btn-modal-locate-agent');
+    if (locateBtn) {
+        locateBtn.onclick = () => {
+            const modalInstance = window.bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+            flyToAgent(agent.id);
+        };
+    }
+
+    const modal = new window.bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+/**
+ * Handle Map Zoom Levels
+ */
+function handleMapZoomLevels() {
+    if (!map) return;
+    const currentZoom = map.getZoom();
+
+    const toggleVillages = document.getElementById('layer-toggle-villages');
+    if (toggleVillages && !toggleVillages.checked) {
+        if (currentZoom >= 13) {
+            if (!map.hasLayer(villageLayerGroup)) map.addLayer(villageLayerGroup);
+        } else {
+            if (map.hasLayer(villageLayerGroup)) map.removeLayer(villageLayerGroup);
+        }
     }
 }
 
 /**
- * Setup UI Event Listeners
+ * Event Listeners Initialization
  */
 function initEventListeners() {
-    const statusFilter = document.getElementById('filter-status');
-    const typeFilter = document.getElementById('filter-type');
-    const searchFilter = document.getElementById('filter-search');
-    const refreshBtn = document.getElementById('btn-refresh-radar');
-    const fitAllBtn = document.getElementById('btn-fit-all');
+    // City Tab Buttons Filter
+    document.querySelectorAll('.btn-city-tab').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.btn-city-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-    if (statusFilter) statusFilter.addEventListener('change', fetchAgents);
-    if (typeFilter) typeFilter.addEventListener('change', fetchAgents);
-    if (searchFilter) {
-        let debounceTimer;
-        searchFilter.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(fetchAgents, 300);
+            currentCityFilter = btn.getAttribute('data-city');
+            fetchAgents();
+
+            // Zoom map to specific region
+            if (currentCityFilter === 'tulungagung') {
+                map.flyTo([-8.0645, 111.9025], 11, { duration: 1.2 });
+            } else if (currentCityFilter === 'blitar') {
+                map.flyTo([-8.0983, 112.1681], 11, { duration: 1.2 });
+            } else if (currentCityFilter === 'trenggalek') {
+                map.flyTo([-8.0506, 111.7145], 11, { duration: 1.2 });
+            } else {
+                map.flyTo(MATARAMAN_CENTER, MATARAMAN_ZOOM, { duration: 1.2 });
+            }
+        });
+    });
+
+    // Reset View Button
+    const resetBtn = document.getElementById('btn-reset-map');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            map.flyTo(MATARAMAN_CENTER, MATARAMAN_ZOOM, { duration: 1.2 });
         });
     }
 
+    // Refresh Sync Button
+    const refreshBtn = document.getElementById('btn-refresh-radar');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
             fetchAgents();
         });
     }
 
-    if (fitAllBtn) {
-        fitAllBtn.addEventListener('click', () => {
-            if (markerClusterGroup && markerClusterGroup.getBounds().isValid()) {
-                map.fitBounds(markerClusterGroup.getBounds().pad(0.1));
-            }
+    // Filter Selects
+    const statusFilter = document.getElementById('filter-status');
+    const typeFilter = document.getElementById('filter-type');
+    const searchFilter = document.getElementById('filter-search');
+
+    if (statusFilter) statusFilter.addEventListener('change', fetchAgents);
+    if (typeFilter) typeFilter.addEventListener('change', fetchAgents);
+    if (searchFilter) {
+        let debounce;
+        searchFilter.addEventListener('input', () => {
+            clearTimeout(debounce);
+            debounce = setTimeout(fetchAgents, 300);
         });
     }
+
+    // HUD Layer Switchers
+    setupLayerToggle('layer-toggle-hq', hqLayerGroup);
+    setupLayerToggle('layer-toggle-regions', regionBoundaryLayer);
+    setupLayerToggle('layer-toggle-districts', districtLayerGroup);
+    setupLayerToggle('layer-toggle-villages', villageLayerGroup);
+    setupLayerToggle('layer-toggle-agents', agentClusterGroup);
 }
 
 /**
- * Toggle Loading Spinner
+ * Setup Layer Toggle Checkbox
+ */
+function setupLayerToggle(checkboxId, layer) {
+    const el = document.getElementById(checkboxId);
+    if (!el || !layer) return;
+
+    el.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            if (!map.hasLayer(layer)) map.addLayer(layer);
+        } else {
+            if (map.hasLayer(layer)) map.removeLayer(layer);
+        }
+    });
+}
+
+/**
+ * Toggle Loading State in Navbar
  */
 function showLoadingState(isLoading) {
     const indicator = document.getElementById('radar-live-indicator');
     if (!indicator) return;
 
     if (isLoading) {
-        indicator.innerHTML = `<span class="spinner-border spinner-border-sm text-info me-1" role="status"></span> SYNCING`;
+        indicator.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" style="width: 10px; height: 10px;"></span> SYNCING`;
     } else {
-        indicator.innerHTML = `<span class="badge bg-success rounded-pill me-1" style="width: 8px; height: 8px; display: inline-block;"></span> LIVE RADAR`;
+        indicator.innerHTML = `<span class="live-dot-pulse"></span> LIVE RADAR`;
     }
 }
