@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Agent;
+use App\Models\Cabang;
 use Tests\TestCase;
 
 class RadarMataramanTest extends TestCase
@@ -63,11 +64,8 @@ class RadarMataramanTest extends TestCase
             'success',
             'stats' => [
                 'total',
-                'active',
-                'patrol',
-                'alert',
-                'standby',
-                'avg_signal',
+                'aktif',
+                'nonaktif',
                 'cities' => [
                     'tulungagung',
                     'blitar',
@@ -94,7 +92,8 @@ class RadarMataramanTest extends TestCase
 
         foreach ($data as $agent) {
             $this->assertEquals('tulungagung', $agent['city']);
-            $this->assertStringStartsWith('AGT-TA-', $agent['code']);
+            $this->assertNotEmpty($agent['nama_agen']);
+            $this->assertNotEmpty($agent['nama_pemilik']);
         }
     }
 
@@ -111,7 +110,7 @@ class RadarMataramanTest extends TestCase
 
         foreach ($data as $agent) {
             $this->assertEquals('blitar', $agent['city']);
-            $this->assertStringStartsWith('AGT-BL-', $agent['code']);
+            $this->assertNotEmpty($agent['nama_agen']);
         }
     }
 
@@ -128,7 +127,7 @@ class RadarMataramanTest extends TestCase
 
         foreach ($data as $agent) {
             $this->assertEquals('trenggalek', $agent['city']);
-            $this->assertStringStartsWith('AGT-TG-', $agent['code']);
+            $this->assertNotEmpty($agent['nama_agen']);
         }
     }
 
@@ -142,7 +141,7 @@ class RadarMataramanTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json('data');
         $this->assertNotEmpty($data);
-        $this->assertEquals('Bambang Pamungkas', $data[0]['name']);
+        $this->assertEquals('Bambang Pamungkas', $data[0]['nama_pemilik']);
         $this->assertEquals('tulungagung', $data[0]['city']);
     }
 
@@ -225,34 +224,34 @@ class RadarMataramanTest extends TestCase
             ],
         ];
 
-        $agents = Agent::all();
+        $agents = Agent::with('cabang')->get();
         $this->assertGreaterThanOrEqual(15, $agents->count());
 
         foreach ($agents as $agent) {
-            $city = $agent->city;
-            $this->assertArrayHasKey($city, $bounds, "Agent {$agent->code} has invalid city: {$city}");
+            $city = $agent->cabang->kode_cabang;
+            $this->assertArrayHasKey($city, $bounds, "Agent {$agent->nama_agen} has invalid city: {$city}");
 
             $cityBound = $bounds[$city];
             $this->assertGreaterThanOrEqual(
                 $cityBound['min_lat'],
                 $agent->latitude,
-                "Agent {$agent->code} ({$city}) latitude {$agent->latitude} is below SW min_lat {$cityBound['min_lat']}"
+                "Agent {$agent->nama_agen} ({$city}) latitude {$agent->latitude} is below SW min_lat {$cityBound['min_lat']}"
             );
             $this->assertLessThanOrEqual(
                 $cityBound['max_lat'],
                 $agent->latitude,
-                "Agent {$agent->code} ({$city}) latitude {$agent->latitude} exceeds NE max_lat {$cityBound['max_lat']}"
+                "Agent {$agent->nama_agen} ({$city}) latitude {$agent->latitude} exceeds NE max_lat {$cityBound['max_lat']}"
             );
 
             $this->assertGreaterThanOrEqual(
                 $cityBound['min_lng'],
                 $agent->longitude,
-                "Agent {$agent->code} ({$city}) longitude {$agent->longitude} is below SW min_lng {$cityBound['min_lng']}"
+                "Agent {$agent->nama_agen} ({$city}) longitude {$agent->longitude} is below SW min_lng {$cityBound['min_lng']}"
             );
             $this->assertLessThanOrEqual(
                 $cityBound['max_lng'],
                 $agent->longitude,
-                "Agent {$agent->code} ({$city}) longitude {$agent->longitude} exceeds NE max_lng {$cityBound['max_lng']}"
+                "Agent {$agent->nama_agen} ({$city}) longitude {$agent->longitude} exceeds NE max_lng {$cityBound['max_lng']}"
             );
         }
     }

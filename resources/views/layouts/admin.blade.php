@@ -25,7 +25,7 @@
                         <span class="badge bg-warning text-dark font-mono fw-bold" style="font-size: 0.65rem; letter-spacing: 0.05em;">ADMIN CONSOLE</span>
                     </div>
                     <small class="text-white-50 font-mono" style="font-size: 0.72rem; letter-spacing: 0.05em;">
-                        SISTEM MANAJEMEN AGEN SPASIAL MATARAMAN
+                        SISTEM MANAJEMEN AGEN KORAN & MITRA MATARAMAN
                     </small>
                 </div>
             </a>

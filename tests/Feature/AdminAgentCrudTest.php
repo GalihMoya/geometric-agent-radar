@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Agent;
+use App\Models\Cabang;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,12 +29,15 @@ class AdminAgentCrudTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.agents.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Data Agen Spasial Mataraman');
+        $response->assertSee('Data Agen & Kios Koran Radar', false);
         $response->assertSee('Tambah Agen Baru');
+        $response->assertSee('Nama Kios & Pemilik', false);
+        $response->assertSee('Tipe Mitra');
+        $response->assertSee('Status agen');
     }
 
     /**
-     * Test admin can filter agents by city on index page.
+     * Test admin can filter agents by city/cabang on index page.
      */
     public function test_admin_can_filter_agents_by_city(): void
     {
@@ -51,8 +55,7 @@ class AdminAgentCrudTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.agents.create'));
 
         $response->assertStatus(200);
-        $response->assertSee('Pendaftaran Agen Spasial Baru');
-        $response->assertSee('Titik Koordinat Geospatial');
+        $response->assertSee('Pendaftaran Mitra & Agen Koran Baru', false);
         $response->assertSee('admin-map');
     }
 
@@ -61,19 +64,18 @@ class AdminAgentCrudTest extends TestCase
      */
     public function test_admin_can_store_new_agent(): void
     {
+        $cabang = Cabang::where('kode_cabang', 'tulungagung')->first();
+
         $data = [
-            'code' => 'TA-999',
-            'name' => 'Bambang Sudarsono',
-            'city' => 'tulungagung',
-            'district' => 'Kedungwaru',
-            'village' => 'Rejotangan',
-            'type' => 'Field Reporter',
-            'status' => 'active',
+            'nama_agen' => 'Kios Koran Sejahtera',
+            'nama_pemilik' => 'Bambang Sudarsono',
+            'cabang_id' => $cabang->id,
+            'tipe_agen' => 'Kios Eceran',
+            'status' => 'aktif',
             'latitude' => -8.064500,
             'longitude' => 111.902500,
-            'signal_strength' => 90,
-            'phone' => '+62 812-3456-7890',
-            'description' => 'Agen peliputan khusus investigasi wilayah Kedungwaru.',
+            'nomor_whatsapp' => '+62 812-3456-7890',
+            'alamat_lengkap' => 'Jl. Pahlawan No. 99, Kedungwaru, Tulungagung',
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.agents.store'), $data);
@@ -82,9 +84,9 @@ class AdminAgentCrudTest extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('agents', [
-            'code' => 'TA-999',
-            'name' => 'Bambang Sudarsono',
-            'city' => 'tulungagung',
+            'nama_agen' => 'Kios Koran Sejahtera',
+            'nama_pemilik' => 'Bambang Sudarsono',
+            'cabang_id' => $cabang->id,
         ]);
     }
 
@@ -94,33 +96,12 @@ class AdminAgentCrudTest extends TestCase
     public function test_store_agent_validation_fails_on_missing_required_fields(): void
     {
         $response = $this->actingAs($this->admin)->post(route('admin.agents.store'), [
-            'name' => '',
-            'code' => '',
+            'nama_agen' => '',
+            'nama_pemilik' => '',
             'latitude' => 'invalid-lat',
         ]);
 
-        $response->assertSessionHasErrors(['code', 'name', 'city', 'type', 'status', 'latitude', 'longitude', 'signal_strength']);
-    }
-
-    /**
-     * Test store validation fails when agent code is duplicate.
-     */
-    public function test_store_agent_validation_fails_on_duplicate_code(): void
-    {
-        $existingAgent = Agent::first();
-
-        $response = $this->actingAs($this->admin)->post(route('admin.agents.store'), [
-            'code' => $existingAgent->code,
-            'name' => 'Agent Duplicate',
-            'city' => 'tulungagung',
-            'type' => 'Field Reporter',
-            'status' => 'active',
-            'latitude' => -8.0645,
-            'longitude' => 111.9025,
-            'signal_strength' => 85,
-        ]);
-
-        $response->assertSessionHasErrors('code');
+        $response->assertSessionHasErrors(['nama_agen', 'nama_pemilik', 'cabang_id', 'tipe_agen', 'status', 'latitude', 'longitude']);
     }
 
     /**
@@ -133,8 +114,8 @@ class AdminAgentCrudTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.agents.edit', $agent));
 
         $response->assertStatus(200);
-        $response->assertSee($agent->name);
-        $response->assertSee($agent->code);
+        $response->assertSee($agent->nama_agen);
+        $response->assertSee($agent->nama_pemilik);
         $response->assertSee('admin-map');
     }
 
@@ -144,20 +125,18 @@ class AdminAgentCrudTest extends TestCase
     public function test_admin_can_update_agent(): void
     {
         $agent = Agent::first();
+        $cabangBlitar = Cabang::where('kode_cabang', 'blitar')->first();
 
         $updateData = [
-            'code' => $agent->code,
-            'name' => 'Nama Agen Terupdate',
-            'city' => 'blitar',
-            'district' => 'Kepanjenkidul',
-            'village' => 'Bendo',
-            'type' => 'Intelijen Spasial',
-            'status' => 'patrol',
+            'nama_agen' => 'Kios Koran Terupdate',
+            'nama_pemilik' => 'Pemilik Baru',
+            'cabang_id' => $cabangBlitar->id,
+            'tipe_agen' => 'Sub-Agen Loper',
+            'status' => 'aktif',
             'latitude' => -8.098300,
             'longitude' => 112.168100,
-            'signal_strength' => 95,
-            'phone' => '+62 813-9999-8888',
-            'description' => 'Deskripsi tugas terupdate.',
+            'nomor_whatsapp' => '+62 813-9999-8888',
+            'alamat_lengkap' => 'Jl. Merdeka No. 10, Blitar',
         ];
 
         $response = $this->actingAs($this->admin)->put(route('admin.agents.update', $agent), $updateData);
@@ -167,9 +146,10 @@ class AdminAgentCrudTest extends TestCase
 
         $this->assertDatabaseHas('agents', [
             'id' => $agent->id,
-            'name' => 'Nama Agen Terupdate',
-            'city' => 'blitar',
-            'status' => 'patrol',
+            'nama_agen' => 'Kios Koran Terupdate',
+            'nama_pemilik' => 'Pemilik Baru',
+            'cabang_id' => $cabangBlitar->id,
+            'status' => 'aktif',
         ]);
     }
 
@@ -178,15 +158,18 @@ class AdminAgentCrudTest extends TestCase
      */
     public function test_admin_can_delete_agent(): void
     {
+        $cabang = Cabang::first();
+
         $agent = Agent::create([
-            'code' => 'TEMP-001',
-            'name' => 'Agent To Delete',
-            'city' => 'trenggalek',
-            'type' => 'Field Reporter',
-            'status' => 'standby',
+            'nama_agen' => 'Kios To Delete',
+            'nama_pemilik' => 'Pemilik Temporary',
+            'cabang_id' => $cabang->id,
+            'tipe_agen' => 'Kios Eceran',
+            'status' => 'nonaktif',
             'latitude' => -8.0506,
             'longitude' => 111.7145,
-            'signal_strength' => 70,
+            'nomor_whatsapp' => '0812345678',
+            'alamat_lengkap' => 'Alamat Sementara',
         ]);
 
         $response = $this->actingAs($this->admin)->delete(route('admin.agents.destroy', $agent));
@@ -196,7 +179,7 @@ class AdminAgentCrudTest extends TestCase
 
         $this->assertDatabaseMissing('agents', [
             'id' => $agent->id,
-            'code' => 'TEMP-001',
+            'nama_agen' => 'Kios To Delete',
         ]);
     }
 }

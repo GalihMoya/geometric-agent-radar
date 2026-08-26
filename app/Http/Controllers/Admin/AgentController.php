@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
+use App\Models\Cabang;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -14,54 +15,56 @@ class AgentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Agent::query();
+        $query = Agent::with('cabang');
 
         // Search filter
         if ($request->filled('search')) {
             $search = trim($request->search);
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('district', 'like', "%{$search}%")
-                  ->orWhere('village', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%");
+                $q->where('nama_agen', 'like', "%{$search}%")
+                  ->orWhere('nama_pemilik', 'like', "%{$search}%")
+                  ->orWhere('alamat_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nomor_whatsapp', 'like', "%{$search}%")
+                  ->orWhere('tipe_agen', 'like', "%{$search}%");
             });
         }
 
-        // City filter
-        if ($request->filled('city') && $request->city !== 'all') {
-            $query->where('city', strtolower($request->city));
+        // Cabang / City filter
+        if ($request->filled('cabang_id') && $request->cabang_id !== 'all') {
+            $query->byCabang($request->cabang_id);
+        } elseif ($request->filled('city') && $request->city !== 'all') {
+            $query->byCabang($request->city);
         }
 
-        // Status filter
+        // Status filter (aktif / nonaktif)
         if ($request->filled('status') && $request->status !== 'all') {
-            $query->where('status', strtolower($request->status));
+            $query->byStatus($request->status);
         }
 
         // Type filter
-        if ($request->filled('type') && $request->type !== 'all') {
-            $query->where('type', $request->type);
+        if ($request->filled('tipe_agen') && $request->tipe_agen !== 'all') {
+            $query->byTipe($request->tipe_agen);
+        } elseif ($request->filled('type') && $request->type !== 'all') {
+            $query->byTipe($request->type);
         }
 
         $agents = $query->latest()->paginate(10)->withQueryString();
+        $cabangs = Cabang::all();
 
         // Statistics for dashboard widgets
         $stats = [
             'total' => Agent::count(),
-            'active' => Agent::where('status', 'active')->count(),
-            'patrol' => Agent::where('status', 'patrol')->count(),
-            'alert' => Agent::where('status', 'alert')->count(),
-            'standby' => Agent::where('status', 'standby')->count(),
-            'tulungagung' => Agent::where('city', 'tulungagung')->count(),
-            'blitar' => Agent::where('city', 'blitar')->count(),
-            'trenggalek' => Agent::where('city', 'trenggalek')->count(),
+            'aktif' => Agent::where('status', 'aktif')->count(),
+            'nonaktif' => Agent::where('status', 'nonaktif')->count(),
+            'tulungagung' => Agent::whereHas('cabang', fn($q) => $q->where('kode_cabang', 'tulungagung'))->count(),
+            'blitar' => Agent::whereHas('cabang', fn($q) => $q->where('kode_cabang', 'blitar'))->count(),
+            'trenggalek' => Agent::whereHas('cabang', fn($q) => $q->where('kode_cabang', 'trenggalek'))->count(),
         ];
 
         // Unique types for filter dropdown
-        $types = Agent::distinct()->pluck('type')->filter()->values();
+        $types = Agent::distinct()->pluck('tipe_agen')->filter()->values();
 
-        return view('admin.agents.index', compact('agents', 'stats', 'types'));
+        return view('admin.agents.index', compact('agents', 'stats', 'types', 'cabangs'));
     }
 
     /**
@@ -69,7 +72,8 @@ class AgentController extends Controller
      */
     public function create()
     {
-        return view('admin.agents.create');
+        $cabangs = Cabang::all();
+        return view('admin.agents.create', compact('cabangs'));
     }
 
     /**
@@ -78,36 +82,32 @@ class AgentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'code' => ['required', 'string', 'max:50', 'unique:agents,code'],
-            'name' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', Rule::in(['tulungagung', 'blitar', 'trenggalek'])],
-            'district' => ['nullable', 'string', 'max:255'],
-            'village' => ['nullable', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', Rule::in(['active', 'patrol', 'alert', 'standby'])],
+            'nama_agen' => ['required', 'string', 'max:255'],
+            'nama_pemilik' => ['required', 'string', 'max:255'],
+            'cabang_id' => ['required', 'integer', 'exists:cabangs,id'],
+            'tipe_agen' => ['required', 'string', 'max:255'],
+            'status' => ['required', 'string', Rule::in(['aktif', 'nonaktif'])],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
-            'signal_strength' => ['required', 'integer', 'between:0,100'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'description' => ['nullable', 'string'],
+            'nomor_whatsapp' => ['nullable', 'string', 'max:50'],
+            'alamat_lengkap' => ['nullable', 'string'],
         ], [
-            'code.required' => 'Kode agen wajib diisi.',
-            'code.unique' => 'Kode agen sudah digunakan, gunakan kode lain.',
-            'name.required' => 'Nama agen wajib diisi.',
-            'city.required' => 'Wilayah kabupaten/kota wajib dipilih.',
-            'city.in' => 'Wilayah harus salah satu dari: Tulungagung, Blitar, atau Trenggalek.',
-            'status.required' => 'Status operasional wajib dipilih.',
-            'latitude.required' => 'Koordinat Latitude wajib diisi (bisa pilih dari peta atau ketik manual).',
+            'nama_agen.required' => 'Nama kios / agen wajib diisi.',
+            'nama_pemilik.required' => 'Nama pemilik wajib diisi.',
+            'cabang_id.required' => 'Kantor cabang Radar wajib dipilih.',
+            'cabang_id.exists' => 'Cabang yang dipilih tidak valid.',
+            'tipe_agen.required' => 'Tipe mitra wajib dipilih.',
+            'status.required' => 'Status agen wajib dipilih.',
+            'latitude.required' => 'Koordinat Latitude wajib diisi.',
             'latitude.numeric' => 'Latitude harus berupa angka valid.',
-            'longitude.required' => 'Koordinat Longitude wajib diisi (bisa pilih dari peta atau ketik manual).',
+            'longitude.required' => 'Koordinat Longitude wajib diisi.',
             'longitude.numeric' => 'Longitude harus berupa angka valid.',
-            'signal_strength.required' => 'Kekuatan sinyal wajib diisi (0 - 100%).',
         ]);
 
         $agent = Agent::create($validated);
 
         return redirect()->route('admin.agents.index')
-            ->with('success', "Agen {$agent->name} ({$agent->code}) berhasil ditambahkan!");
+            ->with('success', "Kios / Agen {$agent->nama_agen} ({$agent->nama_pemilik}) berhasil ditambahkan!");
     }
 
     /**
@@ -123,7 +123,8 @@ class AgentController extends Controller
      */
     public function edit(Agent $agent)
     {
-        return view('admin.agents.edit', compact('agent'));
+        $cabangs = Cabang::all();
+        return view('admin.agents.edit', compact('agent', 'cabangs'));
     }
 
     /**
@@ -132,34 +133,32 @@ class AgentController extends Controller
     public function update(Request $request, Agent $agent)
     {
         $validated = $request->validate([
-            'code' => ['required', 'string', 'max:50', Rule::unique('agents', 'code')->ignore($agent->id)],
-            'name' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', Rule::in(['tulungagung', 'blitar', 'trenggalek'])],
-            'district' => ['nullable', 'string', 'max:255'],
-            'village' => ['nullable', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', Rule::in(['active', 'patrol', 'alert', 'standby'])],
+            'nama_agen' => ['required', 'string', 'max:255'],
+            'nama_pemilik' => ['required', 'string', 'max:255'],
+            'cabang_id' => ['required', 'integer', 'exists:cabangs,id'],
+            'tipe_agen' => ['required', 'string', 'max:255'],
+            'status' => ['required', 'string', Rule::in(['aktif', 'nonaktif'])],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
-            'signal_strength' => ['required', 'integer', 'between:0,100'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'description' => ['nullable', 'string'],
+            'nomor_whatsapp' => ['nullable', 'string', 'max:50'],
+            'alamat_lengkap' => ['nullable', 'string'],
         ], [
-            'code.required' => 'Kode agen wajib diisi.',
-            'code.unique' => 'Kode agen sudah digunakan oleh agen lain.',
-            'name.required' => 'Nama agen wajib diisi.',
-            'city.required' => 'Wilayah kabupaten/kota wajib dipilih.',
+            'nama_agen.required' => 'Nama kios / agen wajib diisi.',
+            'nama_pemilik.required' => 'Nama pemilik wajib diisi.',
+            'cabang_id.required' => 'Kantor cabang Radar wajib dipilih.',
+            'cabang_id.exists' => 'Cabang yang dipilih tidak valid.',
+            'tipe_agen.required' => 'Tipe mitra wajib dipilih.',
+            'status.required' => 'Status agen wajib dipilih.',
             'latitude.required' => 'Koordinat Latitude wajib diisi.',
             'latitude.numeric' => 'Latitude harus berupa angka valid.',
             'longitude.required' => 'Koordinat Longitude wajib diisi.',
             'longitude.numeric' => 'Longitude harus berupa angka valid.',
-            'signal_strength.required' => 'Kekuatan sinyal wajib diisi (0 - 100%).',
         ]);
 
         $agent->update($validated);
 
         return redirect()->route('admin.agents.index')
-            ->with('success', "Data agen {$agent->name} ({$agent->code}) berhasil diperbarui!");
+            ->with('success', "Data agen {$agent->nama_agen} ({$agent->nama_pemilik}) berhasil diperbarui!");
     }
 
     /**
@@ -167,11 +166,11 @@ class AgentController extends Controller
      */
     public function destroy(Agent $agent)
     {
-        $name = $agent->name;
-        $code = $agent->code;
+        $nama = $agent->nama_agen;
+        $pemilik = $agent->nama_pemilik;
         $agent->delete();
 
         return redirect()->route('admin.agents.index')
-            ->with('success', "Agen {$name} ({$code}) telah berhasil dihapus dari sistem.");
+            ->with('success', "Data agen {$nama} ({$pemilik}) telah berhasil dihapus dari sistem.");
     }
 }

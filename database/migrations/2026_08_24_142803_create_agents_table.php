@@ -13,18 +13,15 @@ return new class extends Migration
     {
         Schema::create('agents', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->string('name');
-            $table->enum('city', ['tulungagung', 'blitar', 'trenggalek'])->default('tulungagung');
-            $table->string('district')->nullable();
-            $table->string('village')->nullable();
-            $table->string('type')->default('Field Reporter');
-            $table->enum('status', ['active', 'patrol', 'alert', 'standby'])->default('active');
+            $table->string('nama_agen');
+            $table->string('nama_pemilik');
+            $table->string('tipe_agen')->default('Kios Eceran');
+            $table->string('nomor_whatsapp')->nullable();
+            $table->text('alamat_lengkap')->nullable();
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
-            $table->integer('signal_strength')->default(100);
-            $table->string('phone')->nullable();
-            $table->text('description')->nullable();
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
+            $table->foreignId('cabang_id')->constrained('cabangs')->cascadeOnDelete();
             $table->timestamps();
         });
     }
