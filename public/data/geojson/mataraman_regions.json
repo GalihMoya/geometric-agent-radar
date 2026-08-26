@@ -7,7 +7,18 @@
         "id": "tulungagung",
         "name": "Kabupaten Tulungagung",
         "code": "TA",
-        "center": [-8.0645, 111.9025],
+        "center": [-8.066, 111.900],
+        "bounding_box": {
+          "sw": [-8.350, 111.750],
+          "ne": [-7.850, 112.100]
+        },
+        "bounds": [[-8.350, 111.750], [-7.850, 112.100]],
+        "boundaries": {
+          "north": "Kab. Kediri",
+          "south": "Samudra Hindia",
+          "west": "Kab. Trenggalek",
+          "east": "Kab. Blitar"
+        },
         "color": "#004B87",
         "borderColor": "#0073E6",
         "fillColor": "rgba(0, 75, 135, 0.25)",
@@ -46,7 +57,18 @@
         "id": "blitar",
         "name": "Kabupaten & Kota Blitar",
         "code": "BL",
-        "center": [-8.0983, 112.1681],
+        "center": [-8.100, 112.160],
+        "bounding_box": {
+          "sw": [-8.380, 112.000],
+          "ne": [-7.800, 112.450]
+        },
+        "bounds": [[-8.380, 112.000], [-7.800, 112.450]],
+        "boundaries": {
+          "north": "Kab. Kediri & Kab. Malang",
+          "south": "Samudra Hindia",
+          "west": "Kab. Tulungagung",
+          "east": "Kab. Malang"
+        },
         "color": "#D90429",
         "borderColor": "#EF233C",
         "fillColor": "rgba(217, 4, 41, 0.25)",
@@ -84,7 +106,18 @@
         "id": "trenggalek",
         "name": "Kabupaten Trenggalek",
         "code": "TG",
-        "center": [-8.0506, 111.7145],
+        "center": [-8.050, 111.710],
+        "bounding_box": {
+          "sw": [-8.450, 111.400],
+          "ne": [-7.850, 111.850]
+        },
+        "bounds": [[-8.450, 111.400], [-7.850, 111.850]],
+        "boundaries": {
+          "north": "Kab. Ponorogo",
+          "south": "Samudra Hindia",
+          "west": "Kab. Pacitan",
+          "east": "Kab. Tulungagung"
+        },
         "color": "#E5A900",
         "borderColor": "#FFC107",
         "fillColor": "rgba(229, 169, 0, 0.25)",
