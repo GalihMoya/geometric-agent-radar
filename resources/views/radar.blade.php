@@ -40,6 +40,17 @@
                 <button id="btn-refresh-radar" class="btn btn-sm btn-outline-light font-heading d-flex align-items-center gap-1" title="Sinkronisasi Data">
                     <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-sm-inline">SYNC</span>
                 </button>
+                @auth
+                    @if(Auth::user()->isAdmin())
+                        <a href="{{ route('admin.agents.index') }}" class="btn btn-sm btn-warning font-heading fw-bold d-flex align-items-center gap-1 text-dark shadow-sm" title="Buka Admin Console">
+                            <i class="bi bi-shield-lock-fill"></i> <span class="d-none d-sm-inline">ADMIN CONSOLE</span>
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light font-heading d-flex align-items-center gap-1" title="Login Administrator">
+                        <i class="bi bi-person-lock"></i> <span class="d-none d-sm-inline">ADMIN LOGIN</span>
+                    </a>
+                @endauth
             </div>
         </div>
     </nav>
