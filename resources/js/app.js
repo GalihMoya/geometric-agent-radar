@@ -286,10 +286,9 @@ function renderDistricts(geoJsonData) {
             }
         });
 
-        polygon.bindTooltip(`<strong>${props.name}</strong><br><small>${props.villages_count || 12} Desa/Kelurahan</small>`, {
-            className: `district-map-label district-map-label-${cityId}`,
-            permanent: false,
-            direction: 'center'
+        polygon.bindTooltip(`<strong>${props.name}</strong><br><small class="opacity-75">${props.villages_count || 12} Desa/Kelurahan</small>`, {
+            className: `district-hover-tooltip district-hover-tooltip-${cityId}`,
+            sticky: true
         });
 
         polygon.on('click', () => {
@@ -299,24 +298,32 @@ function renderDistricts(geoJsonData) {
 
         districtLayerGroup.addLayer(polygon);
 
-        const districtMarkerIcon = L.divIcon({
-            className: 'district-marker-pin',
+        // Position district label at the top-left (North-West) corner of the district boundary
+        const districtBounds = polygon.getBounds();
+        const northWestCoord = districtBounds.getNorthWest();
+
+        const districtCornerIcon = L.divIcon({
+            className: 'district-corner-label-container',
             html: `
-                <div class="district-map-label district-map-label-${cityId} text-nowrap">
-                    <i class="bi bi-pin-map-fill"></i> ${props.name.replace('Kecamatan ', '')}
+                <div class="district-corner-label district-corner-label-${cityId} text-nowrap">
+                    <i class="bi bi-geo-alt-fill me-1"></i>${props.name.replace('Kecamatan ', '')}
                 </div>
             `,
-            iconSize: [120, 24],
-            iconAnchor: [60, 12]
+            iconSize: [110, 20],
+            iconAnchor: [0, 0]
         });
 
-        const centerMarker = L.marker(props.center, { icon: districtMarkerIcon });
-        centerMarker.on('click', () => {
+        const cornerMarker = L.marker(northWestCoord, { 
+            icon: districtCornerIcon,
+            interactive: true
+        });
+
+        cornerMarker.on('click', () => {
             map.flyTo(props.center, 13, { duration: 1.2 });
             showVillagesInDistrict(props.id);
         });
 
-        districtLayerGroup.addLayer(centerMarker);
+        districtLayerGroup.addLayer(cornerMarker);
     });
 }
 
@@ -535,14 +542,17 @@ function renderAgentMarkers(agents) {
             openAgentDetailModal(agent);
         });
 
-        // Hover tooltip
+        // Permanent label displaying Kiosk/Agent name directly above the marker
         marker.bindTooltip(`
-            <div class="p-1">
-                <span class="badge badge-city-${city} mb-1">${city.toUpperCase()}</span>
-                <div class="fw-bold font-heading">${agent.nama_agen}</div>
-                <small class="text-muted font-sans">Pemilik: ${agent.nama_pemilik} • ${agent.tipe_agen}</small>
+            <div class="agent-map-label-content">
+                <span class="agent-map-label-name">${agent.nama_agen}</span>
             </div>
-        `, { direction: 'top', offset: [0, -12] });
+        `, { 
+            permanent: true, 
+            direction: 'top', 
+            offset: [0, -14],
+            className: `agent-map-label agent-map-label-${city}`
+        });
 
         agentClusterGroup.addLayer(marker);
         agentMarkersMap[agent.id] = marker;
@@ -770,6 +780,21 @@ function initEventListeners() {
     setupLayerToggle('layer-toggle-districts', districtLayerGroup);
     setupLayerToggle('layer-toggle-villages', villageLayerGroup);
     setupLayerToggle('layer-toggle-agents', agentClusterGroup);
+
+    // Responsive Map Viewport Invalidation on Resize / Orientation Change
+    window.addEventListener('resize', () => {
+        if (map) {
+            map.invalidateSize();
+        }
+    });
+
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+            if (map) {
+                map.invalidateSize();
+            }
+        }, 200);
+    });
 }
 
 /**

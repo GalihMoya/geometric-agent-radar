@@ -13,49 +13,49 @@
 
     <!-- Top Radar Tulungagung Navigation Bar -->
     <nav class="navbar navbar-expand-lg radar-navbar py-2 sticky-top">
-        <div class="container-fluid px-3 px-lg-4">
-            <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="#">
-                <div class="d-flex align-items-center justify-content-center bg-white rounded-2 p-1 shadow-sm" style="width: 38px; height: 38px;">
+        <div class="container-fluid px-2 px-md-3 px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2 gap-md-3 text-decoration-none" href="#">
+                <div class="d-flex align-items-center justify-content-center bg-white rounded-2 p-1 shadow-sm flex-shrink-0" style="width: 36px; height: 36px;">
                     <i class="bi bi-crosshair fs-4" style="color: var(--radar-blue);"></i>
                 </div>
                 <div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="fw-bold font-heading text-white fs-6 lh-1">JAWA POS RADAR TULUNGAGUNG</span>
-                        <span class="radar-logo-badge">PETA DISTRIBUSI AGEN</span>
+                        <span class="radar-logo-badge d-none d-sm-inline-block">PETA DISTRIBUSI AGEN</span>
                     </div>
-                    <small class="text-white-50 font-mono" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                    <small class="text-white-50 font-mono d-none d-md-block" style="font-size: 0.72rem; letter-spacing: 0.05em;">
                         JARINGAN AGEN & KIOS KORAN BIRO MATARAMAN (TA • BL • TG)
                     </small>
                 </div>
             </a>
 
             <!-- Right Controls -->
-            <div class="d-flex align-items-center gap-2 ms-auto">
+            <div class="d-flex align-items-center gap-1 gap-md-2 ms-auto flex-wrap">
                 <div id="radar-live-indicator" class="live-radar-pill font-mono">
                     <span class="live-dot-pulse"></span> LIVE RADAR
                 </div>
                 <button id="btn-reset-map" class="btn btn-sm btn-light text-primary font-heading fw-semibold d-flex align-items-center gap-1 shadow-sm" title="Pusatkan Peta ke Mataraman">
-                    <i class="bi bi-geo-alt-fill text-danger"></i> <span class="d-none d-sm-inline">MATARAMAN VIEW</span>
+                    <i class="bi bi-geo-alt-fill text-danger"></i> <span class="d-none d-md-inline">MATARAMAN VIEW</span>
                 </button>
                 <button id="btn-refresh-radar" class="btn btn-sm btn-outline-light font-heading d-flex align-items-center gap-1" title="Sinkronisasi Data">
-                    <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-sm-inline">SYNC</span>
+                    <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">SYNC</span>
                 </button>
                 @auth
                     @if(Auth::user()->isAdmin())
                         <a href="{{ route('admin.agents.index') }}" class="btn btn-sm btn-warning font-heading fw-bold d-flex align-items-center gap-1 text-dark shadow-sm" title="Buka Admin Console">
-                            <i class="bi bi-shield-lock-fill"></i> <span class="d-none d-sm-inline">ADMIN CONSOLE</span>
+                            <i class="bi bi-shield-lock-fill"></i> <span class="d-none d-md-inline">ADMIN CONSOLE</span>
                         </a>
                     @endif
                 @else
                     <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light font-heading d-flex align-items-center gap-1" title="Login Administrator">
-                        <i class="bi bi-person-lock"></i> <span class="d-none d-sm-inline">ADMIN LOGIN</span>
+                        <i class="bi bi-person-lock"></i> <span class="d-none d-md-inline">ADMIN LOGIN</span>
                     </a>
                 @endauth
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid px-3 px-lg-4 py-3">
+    <div class="container-fluid px-2 px-md-3 px-lg-4 py-2 py-md-3">
         <!-- Regional Filter Bar & Quick Stats -->
         <div class="row g-2 align-items-center mb-3">
             <div class="col-12 col-xl-6">
@@ -80,39 +80,39 @@
             </div>
             
             <div class="col-12 col-xl-6">
-                <!-- Top Mini Stats Grid -->
-                <div class="row g-2">
-                    <div class="col-4 col-sm-2 col-xl-2">
+                <!-- Top Mini Stats Grid (Responsive 2x3 on Mobile, 1x6 on Desktop) -->
+                <div class="row g-1 g-md-2">
+                    <div class="col-4 col-sm-4 col-md-2 col-xl-2">
                         <div class="stat-card stat-all py-2 px-2 text-center">
                             <div class="text-muted font-mono" style="font-size: 0.65rem;">TOTAL AGEN</div>
                             <div id="stat-total-val" class="stat-val fs-5">-</div>
                         </div>
                     </div>
-                    <div class="col-4 col-sm-2 col-xl-2">
+                    <div class="col-4 col-sm-4 col-md-2 col-xl-2">
                         <div class="stat-card stat-ta py-2 px-2 text-center">
                             <div class="text-muted font-mono" style="font-size: 0.65rem;">TULUNGAGUNG</div>
                             <div id="stat-ta-val" class="stat-val fs-5" style="color: var(--color-tulungagung-light);">-</div>
                         </div>
                     </div>
-                    <div class="col-4 col-sm-2 col-xl-2">
+                    <div class="col-4 col-sm-4 col-md-2 col-xl-2">
                         <div class="stat-card stat-bl py-2 px-2 text-center">
                             <div class="text-muted font-mono" style="font-size: 0.65rem;">BLITAR</div>
                             <div id="stat-bl-val" class="stat-val fs-5" style="color: var(--color-blitar);">-</div>
                         </div>
                     </div>
-                    <div class="col-4 col-sm-2 col-xl-2">
+                    <div class="col-4 col-sm-4 col-md-2 col-xl-2">
                         <div class="stat-card stat-tg py-2 px-2 text-center">
                             <div class="text-muted font-mono" style="font-size: 0.65rem;">TRENGGALEK</div>
                             <div id="stat-tg-val" class="stat-val fs-5" style="color: #996800;">-</div>
                         </div>
                     </div>
-                    <div class="col-4 col-sm-2 col-xl-2">
+                    <div class="col-4 col-sm-4 col-md-2 col-xl-2">
                         <div class="stat-card stat-active py-2 px-2 text-center">
                             <div class="text-muted font-mono" style="font-size: 0.65rem;">AKTIF</div>
                             <div id="stat-duty-val" class="stat-val fs-5 text-success">-</div>
                         </div>
                     </div>
-                    <div class="col-4 col-sm-2 col-xl-2">
+                    <div class="col-4 col-sm-4 col-md-2 col-xl-2">
                         <div class="stat-card stat-signal py-2 px-2 text-center">
                             <div class="text-muted font-mono" style="font-size: 0.65rem;">NONAKTIF</div>
                             <div id="stat-signal-val" class="stat-val fs-5 text-secondary">-</div>
@@ -123,10 +123,10 @@
         </div>
 
         <!-- Main Workspace: Sidebar Manifest & Map Viewport -->
-        <div class="row g-3">
+        <div class="row g-3 flex-column-reverse flex-lg-row">
             <!-- Sidebar: Filters & Field Agent Manifest -->
-            <div class="col-lg-4 col-xl-3">
-                <div class="radar-panel p-3 d-flex flex-column" style="height: calc(100vh - 200px); min-height: 540px;">
+            <div class="col-12 col-lg-4 col-xl-3">
+                <div class="radar-panel radar-panel-sidebar p-3 d-flex flex-column" style="height: calc(100vh - 200px); min-height: 540px;">
                     <!-- Filter Section -->
                     <div class="mb-2">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -182,12 +182,12 @@
             </div>
 
             <!-- Map Viewport Container -->
-            <div class="col-lg-8 col-xl-9">
+            <div class="col-12 col-lg-8 col-xl-9">
                 <div class="radar-panel p-2 position-relative">
                     <div id="radar-map"></div>
 
                     <!-- HUD Layer Switcher Controls (Top Right) -->
-                    <div class="position-absolute top-0 end-0 m-3 map-hud-overlay p-2 d-none d-sm-block">
+                    <div class="position-absolute top-0 end-0 m-2 m-md-3 map-hud-overlay p-2 d-none d-sm-block">
                         <div class="small font-heading fw-bold text-dark mb-1 d-flex align-items-center gap-1">
                             <i class="bi bi-layers-fill text-primary"></i> LAYER RADAR
                         </div>
@@ -216,7 +216,7 @@
                     </div>
 
                     <!-- HUD Map Legend Overlay (Bottom Left) -->
-                    <div class="position-absolute bottom-0 start-0 m-3 map-hud-overlay p-2 p-md-3 d-none d-md-block" style="max-width: 440px;">
+                    <div class="position-absolute bottom-0 start-0 m-2 m-md-3 map-hud-overlay p-2 p-md-3 d-none d-md-block" style="max-width: 440px;">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="font-heading small fw-bold text-dark">
                                 <i class="bi bi-info-circle-fill text-primary me-1"></i>DISTRIBUSI KORAN RADAR

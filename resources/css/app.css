@@ -387,26 +387,107 @@ body {
 .agent-marker-trenggalek { color: var(--color-trenggalek); }
 .agent-marker-trenggalek .radar-agent-dot { background-color: var(--color-trenggalek); }
 
-/* District & Village Map Label Tooltips */
-.district-map-label {
-    background: rgba(0, 75, 135, 0.9) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    color: #FFFFFF !important;
+/* Permanent Agent / Kiosk Map Label Tooltips */
+.leaflet-tooltip.agent-map-label {
+    background: #FFFFFF !important;
+    border: 1.5px solid var(--radar-card-border) !important;
+    border-radius: 6px !important;
+    padding: 2px 7px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    font-family: var(--font-heading) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    color: var(--radar-text-dark) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.leaflet-tooltip.agent-map-label:hover {
+    transform: translateY(-2px) scale(1.04) !important;
+    box-shadow: 0 4px 12px rgba(0, 75, 135, 0.25) !important;
+    z-index: 1000 !important;
+}
+
+.leaflet-tooltip.agent-map-label::before {
+    border-top-color: #FFFFFF !important;
+}
+
+.leaflet-tooltip.agent-map-label-tulungagung {
+    border-color: var(--radar-blue-light) !important;
+    border-left: 3.5px solid var(--radar-blue) !important;
+}
+
+.leaflet-tooltip.agent-map-label-blitar {
+    border-color: var(--color-blitar) !important;
+    border-left: 3.5px solid var(--color-blitar) !important;
+}
+
+.leaflet-tooltip.agent-map-label-trenggalek {
+    border-color: var(--color-trenggalek) !important;
+    border-left: 3.5px solid var(--color-trenggalek) !important;
+}
+
+.agent-map-label-name {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--radar-text-dark);
+}
+
+/* District Corner Top-Left Label */
+.district-corner-label-container {
+    background: transparent !important;
+    border: none !important;
+}
+
+.district-corner-label {
+    background: rgba(15, 23, 42, 0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #F8FAFC;
     font-family: var(--font-heading);
     font-weight: 600;
+    font-size: 0.68rem;
+    padding: 2px 7px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.district-corner-label:hover {
+    background: rgba(0, 75, 135, 0.95);
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.district-corner-label-tulungagung {
+    border-left: 3px solid var(--color-tulungagung-light);
+}
+
+.district-corner-label-blitar {
+    border-left: 3px solid var(--color-blitar-light);
+}
+
+.district-corner-label-trenggalek {
+    border-left: 3px solid var(--color-trenggalek-light);
+}
+
+.district-hover-tooltip {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #FFFFFF !important;
+    font-family: var(--font-heading);
     font-size: 0.72rem;
-    padding: 3px 8px;
+    padding: 4px 8px;
     border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.district-map-label-blitar {
-    background: rgba(217, 4, 41, 0.9) !important;
-}
-
-.district-map-label-trenggalek {
-    background: rgba(229, 169, 0, 0.9) !important;
-    color: #1E293B !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .village-map-label {
@@ -621,4 +702,122 @@ body {
 .table-hover > tbody > tr:hover {
     background-color: var(--radar-blue-subtle) !important;
 }
+
+/* ==========================================================================
+   Responsive Multi-Device Layout (Mobile, Tablet, Desktop)
+   ========================================================================== */
+
+/* Mobile & Tablet Devices (< 992px) */
+@media (max-width: 991.98px) {
+    #radar-map {
+        height: 52vh;
+        min-height: 380px;
+    }
+
+    .city-filter-nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .city-filter-nav::-webkit-scrollbar {
+        height: 3px;
+    }
+
+    .btn-city-tab {
+        white-space: nowrap;
+        padding: 6px 12px;
+        font-size: 0.76rem;
+        flex: 0 0 auto;
+    }
+
+    .radar-panel-sidebar {
+        height: auto !important;
+        min-height: unset !important;
+    }
+
+    #agent-list-container {
+        max-height: 340px;
+    }
+
+    .map-hud-overlay {
+        padding: 6px 10px !important;
+    }
+
+    .map-hud-overlay .form-check-label {
+        font-size: 0.7rem !important;
+    }
+
+    .stat-card {
+        padding: 8px 10px;
+    }
+
+    .stat-val {
+        font-size: 1.25rem;
+    }
+}
+
+/* Very Small Mobile Screens (< 576px) */
+@media (max-width: 575.98px) {
+    #radar-map {
+        height: 48vh;
+        min-height: 330px;
+        border-radius: 8px;
+    }
+
+    .navbar-brand {
+        font-size: 0.85rem;
+    }
+
+    .live-radar-pill {
+        padding: 3px 8px;
+        font-size: 0.72rem;
+    }
+
+    .stat-card {
+        padding: 6px 4px;
+    }
+
+    .stat-val {
+        font-size: 1.1rem;
+    }
+
+    .agent-card-item {
+        padding: 10px;
+    }
+
+    .modal-body {
+        padding: 1rem !important;
+    }
+
+    .agent-avatar-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+
+    .agent-modal-header {
+        padding: 14px 16px;
+    }
+}
+
+/* Touch Device Target Sizing */
+@media (pointer: coarse) {
+    .btn-city-tab,
+    .map-hud-control-btn,
+    .agent-card-item,
+    .form-check-input,
+    .form-select-sm,
+    .btn-sm {
+        min-height: 38px;
+    }
+
+    .form-check-input {
+        width: 1.15em;
+        height: 1.15em;
+    }
+}
+
 
