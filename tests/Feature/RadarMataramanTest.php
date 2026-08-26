@@ -166,4 +166,94 @@ class RadarMataramanTest extends TestCase
         $this->assertNotNull(json_decode(file_get_contents($villagesFile)));
         $this->assertNotNull(json_decode(file_get_contents($hqFile)));
     }
+
+    /**
+     * Test GeoJSON contains correct centers and bounding boxes as specified in Issue #5.
+     */
+    public function test_geojson_contains_correct_mataraman_bounds_and_centers(): void
+    {
+        $regionsFile = public_path('data/geojson/mataraman_regions.json');
+        $json = json_decode(file_get_contents($regionsFile), true);
+
+        $features = collect($json['features'])->keyBy('properties.id');
+
+        // Tulungagung
+        $this->assertTrue($features->has('tulungagung'));
+        $taProps = $features['tulungagung']['properties'];
+        $this->assertEquals([-8.066, 111.900], $taProps['center']);
+        $this->assertEquals([-8.350, 111.750], $taProps['bounding_box']['sw']);
+        $this->assertEquals([-7.850, 112.100], $taProps['bounding_box']['ne']);
+
+        // Blitar
+        $this->assertTrue($features->has('blitar'));
+        $blProps = $features['blitar']['properties'];
+        $this->assertEquals([-8.100, 112.160], $blProps['center']);
+        $this->assertEquals([-8.380, 112.000], $blProps['bounding_box']['sw']);
+        $this->assertEquals([-7.800, 112.450], $blProps['bounding_box']['ne']);
+
+        // Trenggalek
+        $this->assertTrue($features->has('trenggalek'));
+        $tgProps = $features['trenggalek']['properties'];
+        $this->assertEquals([-8.050, 111.710], $tgProps['center']);
+        $this->assertEquals([-8.450, 111.400], $tgProps['bounding_box']['sw']);
+        $this->assertEquals([-7.850, 111.850], $tgProps['bounding_box']['ne']);
+    }
+
+    /**
+     * Test all agents in database are strictly within their respective regional bounding boxes.
+     */
+    public function test_all_agents_coordinates_within_prescribed_regional_bounding_boxes(): void
+    {
+        $bounds = [
+            'tulungagung' => [
+                'min_lat' => -8.350,
+                'max_lat' => -7.850,
+                'min_lng' => 111.750,
+                'max_lng' => 112.100,
+            ],
+            'blitar' => [
+                'min_lat' => -8.380,
+                'max_lat' => -7.800,
+                'min_lng' => 112.000,
+                'max_lng' => 112.450,
+            ],
+            'trenggalek' => [
+                'min_lat' => -8.450,
+                'max_lat' => -7.850,
+                'min_lng' => 111.400,
+                'max_lng' => 111.850,
+            ],
+        ];
+
+        $agents = Agent::all();
+        $this->assertGreaterThanOrEqual(15, $agents->count());
+
+        foreach ($agents as $agent) {
+            $city = $agent->city;
+            $this->assertArrayHasKey($city, $bounds, "Agent {$agent->code} has invalid city: {$city}");
+
+            $cityBound = $bounds[$city];
+            $this->assertGreaterThanOrEqual(
+                $cityBound['min_lat'],
+                $agent->latitude,
+                "Agent {$agent->code} ({$city}) latitude {$agent->latitude} is below SW min_lat {$cityBound['min_lat']}"
+            );
+            $this->assertLessThanOrEqual(
+                $cityBound['max_lat'],
+                $agent->latitude,
+                "Agent {$agent->code} ({$city}) latitude {$agent->latitude} exceeds NE max_lat {$cityBound['max_lat']}"
+            );
+
+            $this->assertGreaterThanOrEqual(
+                $cityBound['min_lng'],
+                $agent->longitude,
+                "Agent {$agent->code} ({$city}) longitude {$agent->longitude} is below SW min_lng {$cityBound['min_lng']}"
+            );
+            $this->assertLessThanOrEqual(
+                $cityBound['max_lng'],
+                $agent->longitude,
+                "Agent {$agent->code} ({$city}) longitude {$agent->longitude} exceeds NE max_lng {$cityBound['max_lng']}"
+            );
+        }
+    }
 }

@@ -28,9 +28,33 @@ let rawGeoJsonDistricts = null;
 let rawGeoJsonVillages = null;
 let rawHqData = [];
 
-// Mataraman Map Defaults
+// Mataraman Map Defaults & Precision Bounds (Issue #5)
 const MATARAMAN_CENTER = [-8.1000, 111.9500];
 const MATARAMAN_ZOOM = 10;
+
+const REGION_BOUNDS = {
+    tulungagung: {
+        center: [-8.066, 111.900],
+        bounds: [[-8.350, 111.750], [-7.850, 112.100]],
+        sw: [-8.350, 111.750],
+        ne: [-7.850, 112.100],
+        zoom: 11
+    },
+    blitar: {
+        center: [-8.100, 112.160],
+        bounds: [[-8.380, 112.000], [-7.800, 112.450]],
+        sw: [-8.380, 112.000],
+        ne: [-7.800, 112.450],
+        zoom: 11
+    },
+    trenggalek: {
+        center: [-8.050, 111.710],
+        bounds: [[-8.450, 111.400], [-7.850, 111.850]],
+        sw: [-8.450, 111.400],
+        ne: [-7.850, 111.850],
+        zoom: 11
+    }
+};
 
 // Color Dictionary
 const REGION_COLORS = {
@@ -700,13 +724,10 @@ function initEventListeners() {
             currentCityFilter = btn.getAttribute('data-city');
             fetchAgents();
 
-            // Zoom map to specific region
-            if (currentCityFilter === 'tulungagung') {
-                map.flyTo([-8.0645, 111.9025], 11, { duration: 1.2 });
-            } else if (currentCityFilter === 'blitar') {
-                map.flyTo([-8.0983, 112.1681], 11, { duration: 1.2 });
-            } else if (currentCityFilter === 'trenggalek') {
-                map.flyTo([-8.0506, 111.7145], 11, { duration: 1.2 });
+            // Zoom map to specific region using precision bounds (Issue #5)
+            if (currentCityFilter && REGION_BOUNDS[currentCityFilter]) {
+                const reg = REGION_BOUNDS[currentCityFilter];
+                map.fitBounds(reg.bounds, { padding: [25, 25], maxZoom: 12 });
             } else {
                 map.flyTo(MATARAMAN_CENTER, MATARAMAN_ZOOM, { duration: 1.2 });
             }
