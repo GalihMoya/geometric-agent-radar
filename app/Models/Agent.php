@@ -4,45 +4,56 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Agent extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'code',
-        'name',
-        'city',
-        'district',
-        'village',
-        'type',
-        'status',
+        'nama_agen',
+        'nama_pemilik',
+        'tipe_agen',
+        'nomor_whatsapp',
+        'alamat_lengkap',
         'latitude',
         'longitude',
-        'signal_strength',
-        'phone',
-        'description',
+        'status',
+        'cabang_id',
     ];
 
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',
-        'signal_strength' => 'integer',
+        'cabang_id' => 'integer',
     ];
 
     /**
-     * Scope query to specific city
+     * Relationship to Cabang
      */
-    public function scopeByCity($query, ?string $city)
+    public function cabang(): BelongsTo
     {
-        if ($city && $city !== 'all') {
-            return $query->where('city', strtolower($city));
+        return $this->belongsTo(Cabang::class, 'cabang_id');
+    }
+
+    /**
+     * Scope query to specific cabang
+     */
+    public function scopeByCabang($query, $cabang)
+    {
+        if ($cabang && $cabang !== 'all') {
+            if (is_numeric($cabang)) {
+                return $query->where('cabang_id', $cabang);
+            }
+            return $query->whereHas('cabang', function ($q) use ($cabang) {
+                $q->where('kode_cabang', strtolower($cabang));
+            });
         }
         return $query;
     }
 
     /**
-     * Scope query to specific status
+     * Scope query to specific status (aktif/nonaktif)
      */
     public function scopeByStatus($query, ?string $status)
     {
@@ -53,12 +64,12 @@ class Agent extends Model
     }
 
     /**
-     * Scope query to specific type
+     * Scope query to specific tipe_agen
      */
-    public function scopeByType($query, ?string $type)
+    public function scopeByTipe($query, ?string $tipe)
     {
-        if ($type && $type !== 'all') {
-            return $query->where('type', $type);
+        if ($tipe && $tipe !== 'all') {
+            return $query->where('tipe_agen', $tipe);
         }
         return $query;
     }

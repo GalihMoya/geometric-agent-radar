@@ -576,3 +576,49 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--radar-blue-light);
 }
+
+/* ==========================================================================
+   Admin Console Styles & Utilities
+   ========================================================================== */
+.admin-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-body main {
+    flex: 1 0 auto;
+}
+
+.admin-body footer {
+    flex-shrink: 0;
+}
+
+.hover-primary:hover {
+    color: var(--radar-blue-light) !important;
+}
+
+.btn-xs {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.35rem;
+}
+
+.agent-table-avatar {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    letter-spacing: -0.02em;
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.85rem 0.75rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: var(--radar-blue-subtle) !important;
+}
+

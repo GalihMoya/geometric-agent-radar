@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agent;
+use App\Models\Cabang;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -21,55 +22,60 @@ class AgentController extends Controller
      */
     public function getAgents(Request $request): JsonResponse
     {
-        $query = Agent::query();
+        $query = Agent::with('cabang');
 
-        // City Isolation / Filter
+        // City / Cabang Filter
         if ($request->filled('city') && $request->city !== 'all') {
-            $query->byCity($request->city);
+            $query->byCabang($request->city);
+        } elseif ($request->filled('cabang_id') && $request->cabang_id !== 'all') {
+            $query->byCabang($request->cabang_id);
         }
 
-        // Status Filter
+        // Status Filter (aktif/nonaktif)
         if ($request->filled('status') && $request->status !== 'all') {
             $query->byStatus($request->status);
         }
 
-        // Type Filter
+        // Type Filter (tipe_agen)
         if ($request->filled('type') && $request->type !== 'all') {
-            $query->byType($request->type);
+            $query->byTipe($request->type);
+        } elseif ($request->filled('tipe_agen') && $request->tipe_agen !== 'all') {
+            $query->byTipe($request->tipe_agen);
         }
 
         // Search Filter
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('district', 'like', "%{$search}%")
-                  ->orWhere('village', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                $q->where('nama_agen', 'like', "%{$search}%")
+                  ->orWhere('nama_pemilik', 'like', "%{$search}%")
+                  ->orWhere('alamat_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nomor_whatsapp', 'like', "%{$search}%")
+                  ->orWhere('tipe_agen', 'like', "%{$search}%");
             });
         }
 
-        $agents = $query->orderBy('id', 'asc')->get();
+        $agents = $query->orderBy('id', 'asc')->get()->map(function ($agent) {
+            // Add helper property for frontend compatibility
+            $agent->city = $agent->cabang ? $agent->cabang->kode_cabang : 'tulungagung';
+            return $agent;
+        });
 
-        // Filter-specific or Base stats query
+        // Base or isolated stats query
         $statsQuery = Agent::query();
         if ($request->filled('city') && $request->city !== 'all') {
-            $statsQuery->where('city', $request->city);
+            $statsQuery->byCabang($request->city);
         }
 
         // Calculate statistics
         $stats = [
             'total' => $statsQuery->count(),
-            'active' => (clone $statsQuery)->where('status', 'active')->count(),
-            'patrol' => (clone $statsQuery)->where('status', 'patrol')->count(),
-            'alert' => (clone $statsQuery)->where('status', 'alert')->count(),
-            'standby' => (clone $statsQuery)->where('status', 'standby')->count(),
-            'avg_signal' => round((clone $statsQuery)->avg('signal_strength') ?? 0, 1),
+            'aktif' => (clone $statsQuery)->where('status', 'aktif')->count(),
+            'nonaktif' => (clone $statsQuery)->where('status', 'nonaktif')->count(),
             'cities' => [
-                'tulungagung' => Agent::where('city', 'tulungagung')->count(),
-                'blitar' => Agent::where('city', 'blitar')->count(),
-                'trenggalek' => Agent::where('city', 'trenggalek')->count(),
+                'tulungagung' => Agent::whereHas('cabang', fn($q) => $q->where('kode_cabang', 'tulungagung'))->count(),
+                'blitar' => Agent::whereHas('cabang', fn($q) => $q->where('kode_cabang', 'blitar'))->count(),
+                'trenggalek' => Agent::whereHas('cabang', fn($q) => $q->where('kode_cabang', 'trenggalek'))->count(),
             ]
         ];
 
@@ -82,7 +88,7 @@ class AgentController extends Controller
     }
 
     /**
-     * Return list of 3 main Radar Headquarters (Tulungagung, Blitar, Trenggalek).
+     * Return list of 3 main Radar Headquarters / Branch Offices (Tulungagung, Blitar, Trenggalek).
      */
     public function getHqLocations(): JsonResponse
     {
@@ -99,8 +105,7 @@ class AgentController extends Controller
                 'marker_class' => 'hq-marker-tulungagung',
                 'latitude' => -8.0645,
                 'longitude' => 111.9025,
-                'personnel' => 12,
-                'description' => 'Kantor Pusat Biro Jawa Pos Radar Tulungagung. Pusat komando liputan, percetakan, dan radar taktis regional.',
+                'description' => 'Kantor Pusat Biro Jawa Pos Radar Tulungagung. Pusat komando sirkulasi, percetakan, dan distribusi agen koran regional.',
             ],
             [
                 'id' => 'hq-blitar',
@@ -114,8 +119,7 @@ class AgentController extends Controller
                 'marker_class' => 'hq-marker-blitar',
                 'latitude' => -8.0983,
                 'longitude' => 112.1681,
-                'personnel' => 9,
-                'description' => 'Biro Radar Blitar. Pos liputan strategis Makam Bung Karno, sentra agro, dan dinamika Kota/Kabupaten Blitar.',
+                'description' => 'Biro Radar Blitar. Pos sirkulasi dan distribusi koran wilayah Kota dan Kabupaten Blitar.',
             ],
             [
                 'id' => 'hq-trenggalek',
@@ -129,8 +133,7 @@ class AgentController extends Controller
                 'marker_class' => 'hq-marker-trenggalek',
                 'latitude' => -8.0506,
                 'longitude' => 111.7145,
-                'personnel' => 8,
-                'description' => 'Biro Radar Trenggalek. Pusat informasi pesisir selatan Prigi, pegunungan Menak Sopal, dan infrastruktur wilayah.',
+                'description' => 'Biro Radar Trenggalek. Pusat layanan pelanggan dan distribusi agen koran pesisir & pegunungan Trenggalek.',
             ],
         ];
 

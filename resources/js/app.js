@@ -28,7 +28,7 @@ let rawGeoJsonDistricts = null;
 let rawGeoJsonVillages = null;
 let rawHqData = [];
 
-// Mataraman Map Defaults & Precision Bounds (Issue #5)
+// Mataraman Map Defaults & Precision Bounds
 const MATARAMAN_CENTER = [-8.1000, 111.9500];
 const MATARAMAN_ZOOM = 10;
 
@@ -105,7 +105,7 @@ function initMap() {
         attributionControl: false,
     });
 
-    // Clean modern tile layer (CartoDB Positron / OSM Voyager)
+    // Clean modern tile layer
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         subdomains: 'abcd',
@@ -147,7 +147,7 @@ function createClusterIcon(cluster) {
     let cityCounts = { tulungagung: 0, blitar: 0, trenggalek: 0 };
 
     childMarkers.forEach(m => {
-        const city = m.agentData?.city || 'tulungagung';
+        const city = m.agentData?.city || m.agentData?.cabang?.kode_cabang || 'tulungagung';
         cityCounts[city] = (cityCounts[city] || 0) + 1;
     });
 
@@ -276,7 +276,6 @@ function renderDistricts(geoJsonData) {
         const cityId = props.city || 'tulungagung';
         const colorInfo = REGION_COLORS[cityId] || REGION_COLORS.tulungagung;
 
-        // Polygon
         const polygon = L.geoJSON(feature, {
             style: {
                 fillColor: colorInfo.light,
@@ -287,7 +286,6 @@ function renderDistricts(geoJsonData) {
             }
         });
 
-        // Interactive popup & hover
         polygon.bindTooltip(`<strong>${props.name}</strong><br><small>${props.villages_count || 12} Desa/Kelurahan</small>`, {
             className: `district-map-label district-map-label-${cityId}`,
             permanent: false,
@@ -301,7 +299,6 @@ function renderDistricts(geoJsonData) {
 
         districtLayerGroup.addLayer(polygon);
 
-        // Center Marker Icon with label
         const districtMarkerIcon = L.divIcon({
             className: 'district-marker-pin',
             html: `
@@ -403,7 +400,7 @@ function renderHqMarkers(hqs) {
 
         marker.bindTooltip(`
             <div class="p-1 text-center font-heading">
-                <span class="badge ${hq.city === 'tulungagung' ? 'bg-primary' : hq.city === 'blitar' ? 'bg-danger' : 'bg-warning text-dark'} mb-1">HQ RADAR</span>
+                <span class="badge ${hq.city === 'tulungagung' ? 'bg-primary' : hq.city === 'blitar' ? 'bg-danger' : 'bg-warning text-dark'} mb-1">KANTOR CABANG</span>
                 <div class="fw-bold">${hq.name}</div>
                 <small class="text-muted">${hq.address}</small>
             </div>
@@ -424,7 +421,6 @@ function openHqDetailModal(hq) {
     document.getElementById('modal-hq-city-badge').textContent = `Biro ${hq.city_label}`;
     document.getElementById('modal-hq-address').textContent = hq.address;
     document.getElementById('modal-hq-phone').textContent = hq.phone;
-    document.getElementById('modal-hq-personnel').textContent = `${hq.personnel} Agen Lapangan`;
     document.getElementById('modal-hq-desc').textContent = hq.description;
 
     const headerBg = document.getElementById('modal-hq-header-bg');
@@ -457,7 +453,7 @@ async function fetchAgents() {
             params: {
                 city: currentCityFilter,
                 status: statusFilter,
-                type: typeFilter,
+                tipe_agen: typeFilter,
                 search: searchFilter,
             }
         });
@@ -493,13 +489,13 @@ function updateStatsUI(stats) {
     if (taEl) taEl.textContent = stats.cities?.tulungagung ?? 0;
     if (blEl) blEl.textContent = stats.cities?.blitar ?? 0;
     if (tgEl) tgEl.textContent = stats.cities?.trenggalek ?? 0;
-    if (dutyEl) dutyEl.textContent = (stats.active || 0) + (stats.patrol || 0);
-    if (signalEl) signalEl.textContent = (stats.avg_signal ?? 0) + '%';
+    if (dutyEl) dutyEl.textContent = stats.aktif ?? 0;
+    if (signalEl) signalEl.textContent = stats.nonaktif ?? 0;
     if (badgeEl) badgeEl.textContent = `${stats.total ?? 0} Agen`;
 }
 
 /**
- * Render Agent Markers on Map with Region Colors & Isolation
+ * Render Agent Markers on Map
  */
 function renderAgentMarkers(agents) {
     if (!agentClusterGroup) return;
@@ -508,14 +504,16 @@ function renderAgentMarkers(agents) {
     agentMarkersMap = {};
 
     agents.forEach(agent => {
+        const city = agent.city || agent.cabang?.kode_cabang || 'tulungagung';
+
         // Enforce boundary isolation: Skip agent if city filter does not match
-        if (currentCityFilter !== 'all' && agent.city !== currentCityFilter) {
+        if (currentCityFilter !== 'all' && city !== currentCityFilter) {
             return;
         }
 
-        const cityClass = `agent-marker-${agent.city}`;
+        const cityClass = `agent-marker-${city}`;
         
-        // Custom HTML Marker with pulsating wave ring
+        // Custom HTML Marker with wave ring
         const customIcon = L.divIcon({
             className: 'radar-agent-marker-container',
             html: `
@@ -540,9 +538,9 @@ function renderAgentMarkers(agents) {
         // Hover tooltip
         marker.bindTooltip(`
             <div class="p-1">
-                <span class="badge badge-city-${agent.city} mb-1">${agent.city.toUpperCase()}</span>
-                <div class="fw-bold font-heading">${agent.name}</div>
-                <small class="text-muted font-mono">${agent.code} • ${agent.district || 'Pos Lapangan'}</small>
+                <span class="badge badge-city-${city} mb-1">${city.toUpperCase()}</span>
+                <div class="fw-bold font-heading">${agent.nama_agen}</div>
+                <small class="text-muted font-sans">Pemilik: ${agent.nama_pemilik} • ${agent.tipe_agen}</small>
             </div>
         `, { direction: 'top', offset: [0, -12] });
 
@@ -569,7 +567,7 @@ function renderAgentList(agents) {
     if (agents.length === 0) {
         listContainer.innerHTML = `
             <div class="text-center text-muted py-5">
-                <i class="bi bi-radar display-5 d-block mb-2 text-secondary opacity-50"></i>
+                <i class="bi bi-shop display-5 d-block mb-2 text-secondary opacity-50"></i>
                 <div class="fw-bold font-heading small">TIDAK ADA AGEN DITEMUKAN</div>
                 <small class="font-mono text-muted">Sesuaikan filter wilayah atau kata kunci</small>
             </div>
@@ -578,20 +576,21 @@ function renderAgentList(agents) {
     }
 
     listContainer.innerHTML = agents.map(agent => {
-        const cityLabel = agent.city.charAt(0).toUpperCase() + agent.city.slice(1);
+        const city = agent.city || agent.cabang?.kode_cabang || 'tulungagung';
+        const isAktif = agent.status === 'aktif';
         return `
-            <div class="agent-card-item" data-agent-id="${agent.id}" data-city="${agent.city}">
+            <div class="agent-card-item" data-agent-id="${agent.id}" data-city="${city}">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="badge badge-city-${agent.city} font-mono" style="font-size: 0.72rem;">${agent.code}</span>
-                    <span class="badge badge-status-${agent.status} text-uppercase font-mono" style="font-size: 0.68rem;">${agent.status}</span>
+                    <span class="badge badge-city-${city} font-sans" style="font-size: 0.72rem;">${agent.tipe_agen}</span>
+                    <span class="badge ${isAktif ? 'badge-status-active' : 'bg-secondary text-white'} text-uppercase font-mono" style="font-size: 0.68rem;">${agent.status}</span>
                 </div>
-                <div class="fw-bold text-dark font-heading small mb-1">${agent.name}</div>
-                <div class="d-flex justify-content-between text-muted" style="font-size: 0.73rem;">
-                    <span><i class="bi bi-geo-alt me-1"></i>${agent.district || cityLabel}</span>
-                    <span class="text-success font-mono"><i class="bi bi-broadcast"></i> ${agent.signal_strength}%</span>
+                <div class="fw-bold text-dark font-heading small mb-1">${agent.nama_agen}</div>
+                <div class="text-muted small mb-1" style="font-size: 0.73rem;">
+                    <i class="bi bi-person me-1"></i>${agent.nama_pemilik}
                 </div>
-                <div class="text-muted mt-1" style="font-size: 0.7rem;">
-                    <i class="bi bi-shield-check me-1"></i>${agent.type}
+                <div class="d-flex justify-content-between text-muted" style="font-size: 0.70rem;">
+                    <span class="text-truncate me-1" style="max-width: 140px;"><i class="bi bi-geo-alt me-1"></i>${agent.alamat_lengkap || '-'}</span>
+                    ${agent.nomor_whatsapp ? `<span class="text-success font-mono"><i class="bi bi-whatsapp"></i> WA</span>` : ''}
                 </div>
             </div>
         `;
@@ -632,48 +631,48 @@ function openAgentDetailModal(agent) {
     const modalEl = document.getElementById('agentDetailModal');
     if (!modalEl) return;
 
-    // Fill Modal Data
-    const initials = agent.name.split(' ').map(n => n[0]).slice(0, 2).join('');
-    document.getElementById('modal-agent-avatar').textContent = initials;
-    document.getElementById('modal-agent-name').textContent = agent.name;
-    document.getElementById('modal-agent-code').textContent = agent.code;
+    const city = agent.city || agent.cabang?.kode_cabang || 'tulungagung';
+    const cityLabel = city.charAt(0).toUpperCase() + city.slice(1);
 
-    const cityLabel = agent.city.charAt(0).toUpperCase() + agent.city.slice(1);
+    // Fill Modal Data
+    const initials = agent.nama_agen.split(' ').map(n => n[0]).slice(0, 2).join('');
+    document.getElementById('modal-agent-avatar').textContent = initials || 'AG';
+    document.getElementById('modal-agent-name').textContent = agent.nama_agen;
+    document.getElementById('modal-agent-pemilik').textContent = agent.nama_pemilik;
+    document.getElementById('modal-agent-type').textContent = agent.tipe_agen;
+    document.getElementById('modal-agent-type-badge').textContent = agent.tipe_agen;
+
     document.getElementById('modal-agent-city-badge').textContent = cityLabel;
     document.getElementById('modal-agent-city-label').textContent = `Biro Radar ${cityLabel}`;
-    document.getElementById('modal-agent-district').textContent = agent.district || '-';
-    document.getElementById('modal-agent-village').textContent = agent.village || '-';
-    document.getElementById('modal-agent-type').textContent = agent.type || 'Field Reporter';
+    document.getElementById('modal-agent-address').textContent = agent.alamat_lengkap || 'Belum ada alamat rinci.';
 
     // Status
     const statusEl = document.getElementById('modal-agent-status');
-    statusEl.className = `badge badge-status-${agent.status} text-uppercase font-mono mt-1`;
-    statusEl.textContent = agent.status;
-
-    // Signal
-    const signalVal = agent.signal_strength || 85;
-    document.getElementById('modal-agent-signal-text').textContent = `${signalVal}%`;
-    const signalBar = document.getElementById('modal-agent-signal-bar');
-    signalBar.style.width = `${signalVal}%`;
-    signalBar.className = `progress-bar ${signalVal > 80 ? 'bg-success' : signalVal > 50 ? 'bg-warning' : 'bg-danger'}`;
+    const isAktif = agent.status === 'aktif';
+    statusEl.className = `badge ${isAktif ? 'badge-status-active' : 'bg-secondary text-white'} text-uppercase font-mono mt-1`;
+    statusEl.textContent = agent.status.toUpperCase();
 
     // Coordinates & Phone
-    document.getElementById('modal-agent-coords').textContent = `${agent.latitude.toFixed(4)}, ${agent.longitude.toFixed(4)}`;
-    document.getElementById('modal-agent-phone').textContent = agent.phone || '0812-3456-7890';
+    document.getElementById('modal-agent-coords').textContent = `${Number(agent.latitude).toFixed(4)}, ${Number(agent.longitude).toFixed(4)}`;
+    document.getElementById('modal-agent-phone').textContent = agent.nomor_whatsapp || '-';
     const phoneLink = document.getElementById('modal-agent-phone-link');
     if (phoneLink) {
-        phoneLink.href = `tel:${agent.phone || '081234567890'}`;
+        if (agent.nomor_whatsapp) {
+            const cleanNum = agent.nomor_whatsapp.replace(/[^0-9]/g, '');
+            phoneLink.href = `https://wa.me/${cleanNum.startsWith('0') ? '62' + cleanNum.substring(1) : cleanNum}`;
+            phoneLink.style.display = 'inline-block';
+        } else {
+            phoneLink.href = '#';
+            phoneLink.style.display = 'none';
+        }
     }
-
-    // Description
-    document.getElementById('modal-agent-desc').textContent = agent.description || 'Tidak ada deskripsi penugasan saat ini.';
 
     // Dynamic Header Background Gradient per City
     const headerBg = document.getElementById('modal-header-bg');
     if (headerBg) {
-        if (agent.city === 'tulungagung') {
+        if (city === 'tulungagung') {
             headerBg.style.background = 'linear-gradient(135deg, #002244 0%, #004B87 100%)';
-        } else if (agent.city === 'blitar') {
+        } else if (city === 'blitar') {
             headerBg.style.background = 'linear-gradient(135deg, #7A0012 0%, #D90429 100%)';
         } else {
             headerBg.style.background = 'linear-gradient(135deg, #8A6400 0%, #E5A900 100%)';
@@ -724,7 +723,7 @@ function initEventListeners() {
             currentCityFilter = btn.getAttribute('data-city');
             fetchAgents();
 
-            // Zoom map to specific region using precision bounds (Issue #5)
+            // Zoom map to specific region using precision bounds
             if (currentCityFilter && REGION_BOUNDS[currentCityFilter]) {
                 const reg = REGION_BOUNDS[currentCityFilter];
                 map.fitBounds(reg.bounds, { padding: [25, 25], maxZoom: 12 });
