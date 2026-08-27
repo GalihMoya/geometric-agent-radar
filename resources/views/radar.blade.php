@@ -324,11 +324,16 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="modal-footer bg-light border-top d-flex justify-content-between p-3">
+                <div class="modal-footer bg-light border-top d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
                     <button type="button" class="btn btn-sm btn-outline-secondary font-sans" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" id="btn-modal-locate-agent" class="btn btn-sm btn-primary font-heading fw-semibold d-flex align-items-center gap-1">
-                        <i class="bi bi-crosshair2"></i> Pusatkan Radar ke Kios
-                    </button>
+                    <div class="d-flex gap-2">
+                        <a id="btn-modal-route-agent" href="#" target="_blank" class="btn btn-sm btn-success font-heading fw-semibold d-flex align-items-center gap-1 shadow-sm">
+                            <i class="bi bi-geo-alt-fill"></i> Dapatkan Rute
+                        </a>
+                        <button type="button" id="btn-modal-locate-agent" class="btn btn-sm btn-primary font-heading fw-semibold d-flex align-items-center gap-1 shadow-sm">
+                            <i class="bi bi-crosshair2"></i> Pusatkan Radar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -364,8 +369,11 @@
                     </div>
                     <p id="modal-hq-desc" class="text-muted small mb-0"></p>
                 </div>
-                <div class="modal-footer bg-light border-top p-3">
+                <div class="modal-footer bg-light border-top d-flex justify-content-between align-items-center p-3">
                     <button type="button" class="btn btn-sm btn-secondary font-sans" data-bs-dismiss="modal">Tutup</button>
+                    <a id="btn-modal-route-hq" href="#" target="_blank" class="btn btn-sm btn-success font-heading fw-semibold d-flex align-items-center gap-1 shadow-sm">
+                        <i class="bi bi-geo-alt-fill"></i> Dapatkan Rute
+                    </a>
                 </div>
             </div>
         </div>

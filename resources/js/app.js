@@ -441,6 +441,11 @@ function openHqDetailModal(hq) {
         }
     }
 
+    const routeBtn = document.getElementById('btn-modal-route-hq');
+    if (routeBtn) {
+        routeBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${hq.latitude},${hq.longitude}`;
+    }
+
     const modal = new window.bootstrap.Modal(modalEl);
     modal.show();
 }
@@ -687,6 +692,12 @@ function openAgentDetailModal(agent) {
         } else {
             headerBg.style.background = 'linear-gradient(135deg, #8A6400 0%, #E5A900 100%)';
         }
+    }
+
+    // Route Button inside Modal
+    const routeBtn = document.getElementById('btn-modal-route-agent');
+    if (routeBtn) {
+        routeBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${agent.latitude},${agent.longitude}`;
     }
 
     // Locate Button inside Modal
