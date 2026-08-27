@@ -19,8 +19,8 @@ class CabangSeeder extends Seeder
                 'kode_cabang' => 'tulungagung',
                 'alamat' => 'Jl. I Gusti Ngurah Rai No. 34 / Jl. Jayeng Kusuma, Bago, Kec. Tulungagung',
                 'telepon' => '(0355) 321888',
-                'latitude' => -8.0645,
-                'longitude' => 111.9025,
+                'latitude' => -8.059625,
+                'longitude' => 111.9071825,
                 'warna' => '#004B87',
             ],
             [
@@ -29,8 +29,8 @@ class CabangSeeder extends Seeder
                 'kode_cabang' => 'blitar',
                 'alamat' => 'Jl. Mastrip No. 12 / Jl. Kenanga, Kepanjenkidul, Kota Blitar',
                 'telepon' => '(0342) 811234',
-                'latitude' => -8.0983,
-                'longitude' => 112.1681,
+                'latitude' => -8.0931251,
+                'longitude' => 112.1789795,
                 'warna' => '#D90429',
             ],
             [
@@ -39,8 +39,8 @@ class CabangSeeder extends Seeder
                 'kode_cabang' => 'trenggalek',
                 'alamat' => 'Jl. Panglima Sudirman / Jl. Brigjen Soetran No. 05, Trenggalek',
                 'telepon' => '(0355) 791456',
-                'latitude' => -8.0506,
-                'longitude' => 111.7145,
+                'latitude' => -8.0669383,
+                'longitude' => 111.70837,
                 'warna' => '#E5A900',
             ],
         ];
