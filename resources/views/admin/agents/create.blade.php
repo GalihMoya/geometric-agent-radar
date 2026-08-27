@@ -201,8 +201,30 @@
                 <!-- Map Container Leaflet -->
                 <div id="admin-map" class="rounded-3 border overflow-hidden flex-grow-1" style="min-height: 280px; width: 100%;"></div>
 
+                <!-- Input Tempel Link Google Maps -->
+                <div class="mt-3 pt-3 border-top">
+                    <label for="gmaps_link" class="form-label font-heading fw-semibold small text-secondary d-flex align-items-center gap-1">
+                        <i class="bi bi-google text-danger"></i> Tempel Tautan (Link) Google Maps
+                    </label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light text-muted"><i class="bi bi-link-45deg"></i></span>
+                        <input type="url" 
+                               id="gmaps_link" 
+                               class="form-control font-sans" 
+                               placeholder="Contoh: https://www.google.com/maps/place/.../@-8.0655,111.9015,17z/..."
+                               autocomplete="off">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-clear-gmaps" title="Hapus Link">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted font-sans d-block mt-1" style="font-size: 0.73rem;">
+                        <i class="bi bi-info-circle me-1"></i>Salin link lengkap dari <em>address bar</em> browser untuk mendapatkan koordinat otomatis.
+                    </small>
+                    <div id="gmaps-feedback" class="mt-1 small" style="display: none;"></div>
+                </div>
+
                 <!-- Input Koordinat Manual -->
-                <div class="row g-2 mt-3 pt-3 border-top">
+                <div class="row g-2 mt-1">
                     <div class="col-6">
                         <label for="latitude" class="form-label font-heading fw-semibold small text-secondary">
                             Latitude <span class="text-danger">*</span>
@@ -307,7 +329,117 @@
             else if (sel.includes('trenggalek')) focusPresetCity('trenggalek');
             else focusPresetCity('tulungagung');
         });
+
+        // Google Maps Link Auto-Extraction Listener
+        const gmapsInput = document.getElementById('gmaps_link');
+        if (gmapsInput) {
+            gmapsInput.addEventListener('input', handleGmapsLinkInput);
+            gmapsInput.addEventListener('paste', () => {
+                setTimeout(() => {
+                    handleGmapsLinkInput({ target: gmapsInput });
+                }, 100);
+            });
+        }
+
+        const clearBtn = document.getElementById('btn-clear-gmaps');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                if (gmapsInput) {
+                    gmapsInput.value = '';
+                    handleGmapsLinkInput({ target: gmapsInput });
+                }
+            });
+        }
     });
+
+    function extractCoordinatesFromUrl(url) {
+        if (!url || typeof url !== 'string') return null;
+        url = url.trim();
+
+        // Pattern 1: @lat,lng (Standard Google Maps URL from address bar)
+        const patternAt = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+        const matchAt = url.match(patternAt);
+        if (matchAt && matchAt.length >= 3) {
+            return { lat: matchAt[1], lng: matchAt[2] };
+        }
+
+        // Pattern 2: !3dLat!4dLng (Google Maps place data parameter)
+        const pattern3d4d = /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/;
+        const match3d4d = url.match(pattern3d4d);
+        if (match3d4d && match3d4d.length >= 3) {
+            return { lat: match3d4d[1], lng: match3d4d[2] };
+        }
+
+        // Pattern 3: ?q=lat,lng or &q=lat,lng or query=lat,lng or destination=lat,lng
+        const patternQuery = /[?&](?:q|query|destination|ll|center)=(-?\d+\.\d+),(-?\d+\.\d+)/;
+        const matchQuery = url.match(patternQuery);
+        if (matchQuery && matchQuery.length >= 3) {
+            return { lat: matchQuery[1], lng: matchQuery[2] };
+        }
+
+        // Pattern 4: /search/lat,lng or /dir/lat,lng
+        const patternSearch = /\/(?:search|dir)\/(-?\d+\.\d+),(-?\d+\.\d+)/;
+        const matchSearch = url.match(patternSearch);
+        if (matchSearch && matchSearch.length >= 3) {
+            return { lat: matchSearch[1], lng: matchSearch[2] };
+        }
+
+        // Pattern 5: Raw coordinates "lat, lng"
+        const patternRaw = /^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/;
+        const matchRaw = url.match(patternRaw);
+        if (matchRaw && matchRaw.length >= 3) {
+            return { lat: matchRaw[1], lng: matchRaw[2] };
+        }
+
+        return null;
+    }
+
+    function handleGmapsLinkInput(e) {
+        const url = e.target.value;
+        const feedbackEl = document.getElementById('gmaps-feedback');
+
+        if (!url || !url.trim()) {
+            if (feedbackEl) {
+                feedbackEl.style.display = 'none';
+                feedbackEl.innerHTML = '';
+            }
+            return;
+        }
+
+        // Check if short link (maps.app.goo.gl)
+        if (url.includes('maps.app.goo.gl') || url.includes('goo.gl/maps')) {
+            if (feedbackEl) {
+                feedbackEl.style.display = 'block';
+                feedbackEl.className = 'mt-1 small text-warning font-sans';
+                feedbackEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i>Tautan pendek (short link) terdeteksi. Silakan buka tautan di browser dan salin URL lengkap dari address bar.';
+            }
+            return;
+        }
+
+        const coords = extractCoordinatesFromUrl(url);
+        if (coords) {
+            const lat = parseFloat(coords.lat);
+            const lng = parseFloat(coords.lng);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                updateCoordsInputs(lat, lng);
+                updateMarkerFromInputs();
+                adminMap.panTo([lat, lng]);
+
+                if (feedbackEl) {
+                    feedbackEl.style.display = 'block';
+                    feedbackEl.className = 'mt-1 small text-success font-mono';
+                    feedbackEl.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i>Koordinat berhasil diekstrak: <strong>${lat.toFixed(6)}, ${lng.toFixed(6)}</strong>`;
+                }
+            }
+        } else {
+            if (feedbackEl) {
+                feedbackEl.style.display = 'block';
+                feedbackEl.className = 'mt-1 small text-danger font-sans';
+                feedbackEl.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>Pola koordinat tidak ditemukan. Pastikan menyalin Full URL dari address bar browser.';
+            }
+        }
+    }
 
     function updateCoordsInputs(lat, lng) {
         document.getElementById('latitude').value = parseFloat(lat).toFixed(6);
@@ -317,7 +449,7 @@
     function updateMarkerFromInputs() {
         const lat = parseFloat(document.getElementById('latitude').value);
         const lng = parseFloat(document.getElementById('longitude').value);
-        if (!isNaN(lat) && !isNaN(lng)) {
+        if (!isNaN(lat) && !isNaN(lng) && marker && adminMap) {
             marker.setLatLng([lat, lng]);
             adminMap.panTo([lat, lng]);
         }
