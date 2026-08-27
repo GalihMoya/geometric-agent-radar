@@ -27,6 +27,8 @@ class AdminAuthTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('ADMIN CONSOLE');
         $response->assertSee('RADAR TULUNGAGUNG');
+        $response->assertSee('placeholder="nama@gmail.com"', false);
+        $response->assertDontSee('value="admin@radar.com"', false);
     }
 
     /**
