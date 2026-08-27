@@ -106,10 +106,9 @@ function initMap() {
     });
 
     // Clean modern tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        subdomains: 'abcd',
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> | Radar Tulungagung'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Radar Tulungagung'
     }).addTo(map);
 
     // Zoom control at bottom right
