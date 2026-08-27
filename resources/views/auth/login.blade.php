@@ -59,8 +59,8 @@
                                        class="form-control form-control-lg @error('email') is-invalid @enderror" 
                                        id="email" 
                                        name="email" 
-                                       value="{{ old('email', 'admin@radar.com') }}" 
-                                       placeholder="nama@radar.com" 
+                                       value="{{ old('email') }}" 
+                                       placeholder="nama@gmail.com" 
                                        required 
                                        autofocus>
                                 @error('email')
@@ -96,7 +96,6 @@
                                         Ingat Sesi Saya
                                     </label>
                                 </div>
-                                <!-- <span class="badge bg-light text-secondary border font-mono small">Default: admin@radar.com / password</span> -->
                             </div>
 
                             <!-- Submit Button -->
