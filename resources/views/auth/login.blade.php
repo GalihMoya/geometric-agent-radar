@@ -96,7 +96,7 @@
                                         Ingat Sesi Saya
                                     </label>
                                 </div>
-                                <span class="badge bg-light text-secondary border font-mono small">Default: admin@radar.com / password</span>
+                                <!-- <span class="badge bg-light text-secondary border font-mono small">Default: admin@radar.com / password</span> -->
                             </div>
 
                             <!-- Submit Button -->
