@@ -1,93 +1,62 @@
-# Issue: Penambahan Fitur Rute dan Input Link Google Maps
+# Issue: Perubahan Lokasi Headquarter (Kantor Cabang) Radar
 
 ## Deskripsi
-Terdapat dua penambahan fitur utama yang perlu diimplementasikan pada aplikasi:
-1. **Tombol "Dapatkan Rute" pada Popup Peta**: Menambahkan tombol/link pada popup marker agen di peta yang akan mengarahkan pengguna langsung ke Google Maps untuk rute perjalanan.
-2. **Input Link Google Maps pada Form**: Menambahkan kolom input baru pada form Tambah Agen dan Edit Agen agar admin dapat langsung menempelkan (paste) tautan Google Maps, yang kemudian akan mempermudah pengisian lokasi.
+Lokasi Headquarter (HQ) atau Kantor Pusat Radar untuk wilayah Tulungagung, Blitar, dan Trenggalek perlu diperbarui agar sesuai dengan titik lokasi yang ada di Google Maps terbaru.
+
+Berikut adalah tautan referensi lokasi Google Maps yang baru:
+- **Radar Tulungagung**: [Google Maps](https://www.google.com/maps/place/Jawa+Pos+Radar+Tulungagung/@-8.058933,111.9062348,16z/data=!4m6!3m5!1s0x2e78e320dc2b1745:0x1172f903156039bc!8m2!3d-8.059625!4d111.9071825!16s%2Fg%2F11cnbh7b5g?entry=ttu&g_ep=EgoyMDI2MDgyNC4wIKXMDSoASAFQAw%3D%3D)
+- **Radar Blitar**: [Google Maps](https://www.google.com/maps/place/Jawa+Pos+Radar+Blitar/@-8.0931251,112.1789795,17z/data=!3m1!4b1!4m6!3m5!1s0x2e78ec6f3fb12493:0xc163873ffb26aa21!8m2!3d-8.0931251!4d112.1789795!16s%2Fg%2F11dxq8cb6x?entry=ttu&g_ep=EgoyMDI2MDgyNC4wIKXMDSoASAFQAw%3D%3D)
+- **Radar Trenggalek**: [Google Maps](google.com/maps/place/Jawa+Pos+Radar+Trenggalek/@-8.0670631,111.6993701,16z/data=!4m7!3m6!1s0x2e7905289af6ea97:0x11b51c5a3ffa2e7d!8m2!3d-8.0669383!4d111.70837!15sChByYWRhciB0cmVuZ2dhbGVrkgENbWVkaWFfY29tcGFueeABAA!16s%2Fg%2F1hm3lh0qw?entry=tts&g_ep=EgoyMDI2MDgyNC4wIPu8ASoASAFQAw%3D%3D&skid=6299b6ec-ddca-4523-9164-8b5b53bee089)
+
+### Ekstraksi Koordinat Baru (Latitude, Longitude)
+Dari link di atas, didapatkan koordinat akurat berikut:
+1. **Tulungagung**
+   - **Lama**: `-8.0645, 111.9025`
+   - **Baru**: `-8.059625, 111.9071825`
+2. **Blitar**
+   - **Lama**: `-8.0983, 112.1681`
+   - **Baru**: `-8.0931251, 112.1789795`
+3. **Trenggalek**
+   - **Lama**: `-8.0506, 111.7145`
+   - **Baru**: `-8.0669383, 111.70837`
 
 ---
 
 ## Tahapan Pengerjaan (Langkah demi Langkah)
 
-Instruksi di bawah ini disusun sedemikian rupa agar detail dan terstruktur, sehingga akan sangat mudah diikuti oleh Junior Programmer maupun AI Assistant saat proses pengkodean (coding).
+Untuk AI atau Junior Programmer yang bertugas, perhatikan bahwa data koordinat HQ ini tersebar di berbagai *file* (JSON, seeder, controller, view, dan test). 
 
-### Fitur 1: Tombol "Dapatkan Rute" pada Popup Agen di Peta
+Gunakan fitur _Global Search_ (atau `grep_search`) di *code editor* Anda untuk mencari angka koordinat lama, lalu gantilah dengan angka koordinat yang baru.
 
-**Tujuan:** Saat marker agen diklik pada peta, popup informasi yang muncul harus memuat tombol "Dapatkan Rute" yang apabila diklik akan membuka tab baru ke arah rute Google Maps.
+### Langkah 1: Update Data GeoJSON (Front-End Map)
+Ubah array koordinat `[Longitude, Latitude]` pada file JSON berikut. *(Perhatikan formatnya dibalik: Bujur dulu, baru Lintang)*
+1. Buka file `public/data/geojson/radar_hq.json`
+2. Buka file `public/data/geojson/mataraman_regions.json` (pada properties `hq_coords`)
+   - Cari dan ganti `[111.9025, -8.0645]` menjadi `[111.9071825, -8.059625]`
+   - Cari dan ganti `[112.1681, -8.0983]` menjadi `[112.1789795, -8.0931251]`
+   - Cari dan ganti `[111.7145, -8.0506]` menjadi `[111.70837, -8.0669383]`
 
-**Langkah-langkah:**
-1. **Identifikasi File JavaScript/View Peta:**
-   - Cari file JavaScript atau file view (HTML/Blade/PHP) yang bertanggung jawab untuk menampilkan peta dan me-render (membuat) marker lokasi agen.
-   - Temukan baris kode yang mengatur isi/konten HTML dari popup marker (biasanya menggunakan fungsi seperti `bindPopup()` pada Leaflet.js atau `InfoWindow` pada Google Maps API).
-2. **Penambahan Elemen HTML untuk Tombol:**
-   - Di dalam string atau template literal HTML popup tersebut, tambahkan tag tautan `<a>` baru yang bergaya seperti tombol.
-   - Gunakan format URL rute Google Maps: `https://www.google.com/maps/dir/?api=1&destination={LATITUDE},{LONGITUDE}`.
-   - **Contoh Implementasi:**
-     ```html
-     <a href="https://www.google.com/maps/dir/?api=1&destination=${agent.latitude},${agent.longitude}" target="_blank" class="btn btn-primary btn-sm mt-2">
-        📍 Dapatkan Rute
-     </a>
-     ```
-   - *Catatan Kritis:* Pastikan variabel `${agent.latitude}` dan `${agent.longitude}` disesuaikan dengan nama variabel objek data yang benar di dalam iterasi (loop) marker Anda.
-3. **Pengujian Terarah (Testing):**
-   - Buka halaman utama peta pada browser.
-   - Klik salah satu pin/marker agen.
-   - Klik tombol "Dapatkan Rute". Validasi bahwa browser membuka tab baru yang menampilkan titik tujuan yang akurat di Google Maps.
+### Langkah 2: Update Data Backend (Seeder & Controller)
+Ubah nilai `latitude` dan `longitude` di file-file PHP berikut:
+1. `database/seeders/CabangSeeder.php`
+2. `app/Http/Controllers/AgentController.php` (pada default map center saat create)
+   - Ganti angka `-8.0645` menjadi `-8.059625` dan `111.9025` menjadi `111.9071825` (dan seterusnya untuk Blitar dan Trenggalek).
 
----
+### Langkah 3: Update View (Admin Maps Defaults)
+Ubah titik tengah peta bawaan pada form JavaScript.
+1. Buka `resources/views/admin/agents/create.blade.php`
+2. Buka `resources/views/admin/agents/edit.blade.php`
+   - Di dalam tag `<script>`, cari object `const defaultLocations = { tulungagung: [...], blitar: [...], trenggalek: [...] };` dan perbarui koordinatnya.
 
-### Fitur 2: Tempel (Paste) Tautan Google Maps pada Form
+### Langkah 4: Update Unit Tests & Dokumentasi
+1. Buka `tests/Feature/RadarMataramanTest.php` dan `tests/Feature/AdminAgentCrudTest.php`
+   - Perbarui angka koordinat dalam blok _assertion_ `->assertEquals(-8.0645, ...)` atau data *factory* `['latitude' => -8.064500]` ke angka koordinat yang baru.
+2. Buka `README.md`
+   - Ganti referensi koordinat lama di bagian daftar HQ.
 
-**Tujuan:** Menambahkan fitur agar admin hanya perlu melakukan _paste_ (tempel) URL lokasi Google Maps, dan sistem secara otomatis mengekstrak Latitude serta Longitude untuk mengisi formulir koordinat secara otomatis (auto-fill).
-
-**Langkah-langkah:**
-1. **Modifikasi Antarmuka Pengguna (UI) Form Tambah/Edit:**
-   - Buka file view yang memuat form **Tambah Agen** dan **Edit Agen**.
-   - Tambahkan elemen `<input>` teks baru tepat di atas input "Latitude" dan "Longitude" yang sudah ada.
-   - **Contoh HTML:**
-     ```html
-     <div class="form-group mb-3">
-         <label for="gmaps_link">Tempel Tautan (Link) Google Maps</label>
-         <input type="url" id="gmaps_link" class="form-control" placeholder="Contoh: https://www.google.com/maps/place/.../@-6.200,106.816,15z/...">
-         <small class="text-muted">Tempelkan link URL dari browser (bukan link share pendek) untuk mendapatkan koordinat otomatis.</small>
-     </div>
-     ```
-2. **Pembuatan Logika Ekstraksi (JavaScript):**
-   - Di bagian bawah file view tersebut, buat blok `<script>` baru.
-   - Tambahkan event listener untuk memantau perubahan teks (event `input` atau `paste`) pada elemen `#gmaps_link`.
-   - Gunakan _Regular Expression_ (RegEx) untuk mendeteksi pola koordinat (`@lat,lng`) dari URL yang diinputkan.
-   - **Contoh Script Logika:**
-     ```javascript
-     document.getElementById('gmaps_link').addEventListener('input', function(e) {
-         const url = e.target.value;
-         
-         // RegEx mendeteksi pola @latitude,longitude di URL Maps
-         const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-         const match = url.match(regex);
-         
-         if (match && match.length >= 3) {
-             const lat = match[1];
-             const lng = match[2];
-             
-             // Auto-fill ke input koordinat form (Sesuaikan ID element-nya!)
-             document.getElementById('latitude').value = lat;
-             document.getElementById('longitude').value = lng;
-             
-             // Opsi UX: Berikan feedback visual bahwa koordinat berhasil diekstrak
-             alert('Koordinat berhasil diekstrak dari link!');
-         }
-     });
-     ```
-   - *Catatan Kritis:* Pastikan ID `latitude` dan `longitude` di dalam skrip JavaScript sesuai dengan atribut `id` pada form input aplikasi yang sebenarnya.
-3. **Pengujian Terarah (Testing):**
-   - Buka halaman form Tambah Agen.
-   - Buka Google Maps, cari sebuah lokasi, lalu **salin (copy) link dari address bar atas browser**.
-   - Paste link ke field yang baru dibuat.
-   - Validasi bahwa nilai Latitude dan Longitude seketika terisi di form yang sesuai.
-
----
-
-## ⚠️ Batasan & Perhatian Khusus
-- Untuk Fitur 2, metode ekstraksi via JavaScript (Frontend) mengandalkan **Link Panjang (Full URL)** dari address bar browser karena koordinat terlihat jelas dalam bentuk teks (`@lat,lng`). 
-- Apabila Admin menempelkan **Link Pendek (Short URL)** dari tombol "Share" (misal: `https://maps.app.goo.gl/xxx`), skrip ini tidak akan bisa membacanya karena koordinat disembunyikan dalam URL sebelum _redirect_. 
-- Solusi untuk saat ini adalah dengan memberikan panduan visual (`<small>`) kepada admin untuk menyalin langsung dari Address Bar browser agar praktis dan cepat, bukan via tombol Share. Bila URL pendek mutlak ingin di-_support_ ke depannya, implementasinya perlu berpindah menggunakan validasi Backend API.
+### Langkah 5: Verifikasi
+Setelah semua file di atas diubah, jalankan pengujian berikut untuk memastikan tidak ada yang terlewat:
+```bash
+php artisan test
+```
+Pastikan semua *test* menghasilkan status **PASS**.
