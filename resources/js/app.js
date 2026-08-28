@@ -296,33 +296,6 @@ function renderDistricts(geoJsonData) {
         });
 
         districtLayerGroup.addLayer(polygon);
-
-        // Position district label at the top-left (North-West) corner of the district boundary
-        const districtBounds = polygon.getBounds();
-        const northWestCoord = districtBounds.getNorthWest();
-
-        const districtCornerIcon = L.divIcon({
-            className: 'district-corner-label-container',
-            html: `
-                <div class="district-corner-label district-corner-label-${cityId} text-nowrap">
-                    <i class="bi bi-geo-alt-fill me-1"></i>${props.name.replace('Kecamatan ', '')}
-                </div>
-            `,
-            iconSize: [110, 20],
-            iconAnchor: [0, 0]
-        });
-
-        const cornerMarker = L.marker(northWestCoord, { 
-            icon: districtCornerIcon,
-            interactive: true
-        });
-
-        cornerMarker.on('click', () => {
-            map.flyTo(props.center, 13, { duration: 1.2 });
-            showVillagesInDistrict(props.id);
-        });
-
-        districtLayerGroup.addLayer(cornerMarker);
     });
 }
 
@@ -523,7 +496,7 @@ function renderAgentMarkers(agents) {
         }
 
         const cityClass = `agent-marker-${city}`;
-        
+
         // Custom HTML Marker with wave ring
         const customIcon = L.divIcon({
             className: 'radar-agent-marker-container',
@@ -551,11 +524,21 @@ function renderAgentMarkers(agents) {
             <div class="agent-map-label-content">
                 <span class="agent-map-label-name">${agent.nama_agen}</span>
             </div>
-        `, { 
-            permanent: true, 
-            direction: 'top', 
+        `, {
+            permanent: true,
+            interactive: true,
+            direction: 'top',
             offset: [0, -14],
             className: `agent-map-label agent-map-label-${city}`
+        });
+
+        marker.on('tooltipopen', (e) => {
+            if (e.tooltip && e.tooltip.getElement()) {
+                e.tooltip.getElement().onclick = (ev) => {
+                    ev.stopPropagation();
+                    openAgentDetailModal(agent);
+                };
+            }
         });
 
         agentClusterGroup.addLayer(marker);
