@@ -18,9 +18,7 @@
     <nav class="navbar navbar-expand-lg radar-navbar py-2 sticky-top">
         <div class="container-fluid px-2 px-md-3 px-lg-4">
             <a class="navbar-brand d-flex align-items-center gap-2 gap-md-3 text-decoration-none" href="#">
-                <div class="d-flex align-items-center justify-content-center bg-white rounded-2 p-1 shadow-sm flex-shrink-0" style="width: 36px; height: 36px;">
-                    <i class="bi bi-crosshair fs-4" style="color: var(--radar-blue);"></i>
-                </div>
+                <img src="{{ asset('RadarTulungagung.png')}}" alt="Radar Tulungagung" class="img-fluid" style="width: 45px; height: 45px; border-radius: 50%;">
                 <div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="fw-bold font-heading text-white fs-6 lh-1">JAWA POS RADAR TULUNGAGUNG</span>
