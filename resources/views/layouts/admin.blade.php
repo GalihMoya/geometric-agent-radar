@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Panel') - Jawa Pos Radar Tulungagung</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('RadarTulungagung.png') }}">
+
     <!-- Google Fonts & Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')

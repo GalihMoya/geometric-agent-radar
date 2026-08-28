@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Radar Tulungagung - Geometric Agent Radar (Tulungagung • Blitar • Trenggalek)</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('RadarTulungagung.png') }}">
+
     <!-- Google Fonts & Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
