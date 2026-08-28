@@ -23,7 +23,7 @@
                     <!-- Card Header / Brand -->
                     <div class="p-4 text-center text-white" style="background: var(--radar-blue-dark);">
                         <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-3 p-2 mb-3 shadow">
-                            <i class="bi bi-shield-lock-fill fs-2" style="color: var(--radar-blue);"></i>
+                            <img src="{{ asset('RadarTulungagung.png')}}" alt="Radar Tulungagung" class="img-fluid" style="width: 50px; height: 50px; border-radius: 50%;">
                         </div>
                         <h4 class="font-heading fw-bold mb-1">ADMIN CONSOLE</h4>
                         <div class="text-white-50 font-mono" style="font-size: 0.8rem; letter-spacing: 0.05em;">
