@@ -72,8 +72,8 @@ class AdminAgentCrudTest extends TestCase
             'cabang_id' => $cabang->id,
             'tipe_agen' => 'Kios Eceran',
             'status' => 'aktif',
-            'latitude' => -8.064500,
-            'longitude' => 111.902500,
+            'latitude' => -8.059625,
+            'longitude' => 111.9071825,
             'nomor_whatsapp' => '+62 812-3456-7890',
             'alamat_lengkap' => 'Jl. Pahlawan No. 99, Kedungwaru, Tulungagung',
         ];
@@ -133,8 +133,8 @@ class AdminAgentCrudTest extends TestCase
             'cabang_id' => $cabangBlitar->id,
             'tipe_agen' => 'Sub-Agen Loper',
             'status' => 'aktif',
-            'latitude' => -8.098300,
-            'longitude' => 112.168100,
+            'latitude' => -8.0931251,
+            'longitude' => 112.1789795,
             'nomor_whatsapp' => '+62 813-9999-8888',
             'alamat_lengkap' => 'Jl. Merdeka No. 10, Blitar',
         ];
@@ -166,8 +166,8 @@ class AdminAgentCrudTest extends TestCase
             'cabang_id' => $cabang->id,
             'tipe_agen' => 'Kios Eceran',
             'status' => 'nonaktif',
-            'latitude' => -8.0506,
-            'longitude' => 111.7145,
+            'latitude' => -8.0669383,
+            'longitude' => 111.70837,
             'nomor_whatsapp' => '0812345678',
             'alamat_lengkap' => 'Alamat Sementara',
         ]);

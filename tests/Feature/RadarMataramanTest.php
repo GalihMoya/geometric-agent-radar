@@ -48,8 +48,8 @@ class RadarMataramanTest extends TestCase
 
         // Verify Tulungagung HQ coords
         $taHq = collect($data)->firstWhere('city', 'tulungagung');
-        $this->assertEquals(-8.0645, $taHq['latitude']);
-        $this->assertEquals(111.9025, $taHq['longitude']);
+        $this->assertEquals(-8.059625, $taHq['latitude']);
+        $this->assertEquals(111.9071825, $taHq['longitude']);
     }
 
     /**

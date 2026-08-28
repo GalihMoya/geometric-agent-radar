@@ -103,8 +103,8 @@ class AgentController extends Controller
                 'color' => '#004B87',
                 'accent' => '#0073E6',
                 'marker_class' => 'hq-marker-tulungagung',
-                'latitude' => -8.0645,
-                'longitude' => 111.9025,
+                'latitude' => -8.059625,
+                'longitude' => 111.9071825,
                 'description' => 'Kantor Pusat Biro Jawa Pos Radar Tulungagung. Pusat komando sirkulasi, percetakan, dan distribusi agen koran regional.',
             ],
             [
@@ -117,8 +117,8 @@ class AgentController extends Controller
                 'color' => '#D90429',
                 'accent' => '#EF233C',
                 'marker_class' => 'hq-marker-blitar',
-                'latitude' => -8.0983,
-                'longitude' => 112.1681,
+                'latitude' => -8.0931251,
+                'longitude' => 112.1789795,
                 'description' => 'Biro Radar Blitar. Pos sirkulasi dan distribusi koran wilayah Kota dan Kabupaten Blitar.',
             ],
             [
@@ -131,8 +131,8 @@ class AgentController extends Controller
                 'color' => '#E5A900',
                 'accent' => '#FFC107',
                 'marker_class' => 'hq-marker-trenggalek',
-                'latitude' => -8.0506,
-                'longitude' => 111.7145,
+                'latitude' => -8.0669383,
+                'longitude' => 111.70837,
                 'description' => 'Biro Radar Trenggalek. Pusat layanan pelanggan dan distribusi agen koran pesisir & pegunungan Trenggalek.',
             ],
         ];

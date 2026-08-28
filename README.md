@@ -24,9 +24,9 @@
   - **Level Kecamatan (Districts)**: Batas poligon dan pin label interaktif (27 kecamatan).
   - **Level Desa (Villages)**: Titik desa/kelurahan dengan polygon highlight saat diklik.
 - 🏢 **3 Kantor Utama Radar (Landmark HQ)**:
-  - **Radar Tulungagung HQ**: Jl. I Gusti Ngurah Rai No. 34 / Jayeng Kusuma, Bago (`[-8.0645, 111.9025]`)
-  - **Radar Blitar HQ**: Jl. Mastrip No. 12 / Kenanga, Kepanjenkidul (`[-8.0983, 112.1681]`)
-  - **Radar Trenggalek HQ**: Jl. Brigjen Soetran No. 05, Trenggalek (`[-8.0506, 111.7145]`)
+  - **Radar Tulungagung HQ**: Jl. I Gusti Ngurah Rai No. 34 / Jayeng Kusuma, Bago (`[-8.059625, 111.9071825]`)
+  - **Radar Blitar HQ**: Jl. Mastrip No. 12 / Kenanga, Kepanjenkidul (`[-8.0931251, 112.1789795]`)
+  - **Radar Trenggalek HQ**: Jl. Brigjen Soetran No. 05, Trenggalek (`[-8.0669383, 111.70837]`)
 - 👥 **27 Agen Lapangan Terdistribusi**:
   - Penamaan otentik Indonesia dengan status operasional (*Active, Patrol, Alert, Standby*).
   - Spesialisasi peran (*Tactical Lead, Field Reporter, Scout Drone, Investigative Recon, Traffic Patrol*).

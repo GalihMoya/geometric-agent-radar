@@ -24,7 +24,7 @@
         "fillColor": "rgba(0, 75, 135, 0.25)",
         "hq": "Kantor Radar Tulungagung",
         "hq_address": "Jl. I Gusti Ngurah Rai No. 34, Bago, Kec. Tulungagung",
-        "hq_coords": [-8.0645, 111.9025],
+        "hq_coords": [-8.059625, 111.9071825],
         "districts_count": 19
       },
       "geometry": {
@@ -74,7 +74,7 @@
         "fillColor": "rgba(217, 4, 41, 0.25)",
         "hq": "Kantor Radar Blitar",
         "hq_address": "Jl. Mastrip No. 12, Kepanjenkidul, Kota Blitar",
-        "hq_coords": [-8.0983, 112.1681],
+        "hq_coords": [-8.0931251, 112.1789795],
         "districts_count": 22
       },
       "geometry": {
@@ -123,7 +123,7 @@
         "fillColor": "rgba(229, 169, 0, 0.25)",
         "hq": "Kantor Radar Trenggalek",
         "hq_address": "Jl. Brigjen Soetran No. 05, Trenggalek",
-        "hq_coords": [-8.0506, 111.7145],
+        "hq_coords": [-8.0669383, 111.70837],
         "districts_count": 14
       },
       "geometry": {

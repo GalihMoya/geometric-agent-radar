@@ -286,9 +286,9 @@
     let marker = null;
 
     const cityCenters = {
-        tulungagung: [-8.0645, 111.9025],
-        blitar: [-8.0983, 112.1681],
-        trenggalek: [-8.0506, 111.7145],
+        tulungagung: [-8.059625, 111.9071825],
+        blitar: [-8.0931251, 112.1789795],
+        trenggalek: [-8.0669383, 111.70837],
     };
 
     document.addEventListener('DOMContentLoaded', () => {
