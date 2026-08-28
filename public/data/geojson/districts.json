@@ -1,0 +1,680 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-tulungagung",
+        "name": "Kecamatan Tulungagung (Kota)",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.0655, 111.9015],
+        "color": "#004B87",
+        "villages_count": 14,
+        "description": "Pusat pemerintahan dan komersial Kabupaten Tulungagung."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.885, -8.050],
+            [111.918, -8.050],
+            [111.920, -8.080],
+            [111.885, -8.080],
+            [111.885, -8.050]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-boyolangu",
+        "name": "Kecamatan Boyolangu",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.1150, 111.8980],
+        "color": "#004B87",
+        "villages_count": 17,
+        "description": "Kawasan pendidikan dan situs arkeologi Candi Gayatri."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.870, -8.085],
+            [111.925, -8.085],
+            [111.930, -8.145],
+            [111.865, -8.145],
+            [111.870, -8.085]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-kedungwaru",
+        "name": "Kecamatan Kedungwaru",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.0450, 111.9210],
+        "color": "#004B87",
+        "villages_count": 19,
+        "description": "Sentra industri agro, rumah sakit umum, dan lingkar timur."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.895, -8.015],
+            [111.950, -8.015],
+            [111.945, -8.065],
+            [111.895, -8.065],
+            [111.895, -8.015]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-ngunut",
+        "name": "Kecamatan Ngunut",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.1100, 112.0120],
+        "color": "#004B87",
+        "villages_count": 18,
+        "description": "Pusat industri kreatif, logam, dan perdagangan perbatasan Blitar."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.970, -8.080],
+            [112.050, -8.080],
+            [112.055, -8.145],
+            [111.965, -8.145],
+            [111.970, -8.080]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-campurdarat",
+        "name": "Kecamatan Campurdarat",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.1720, 111.8540],
+        "color": "#004B87",
+        "villages_count": 9,
+        "description": "Ibukota sentra kerajinan batu marmer dan onyx nasional."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.815, -8.135],
+            [111.895, -8.135],
+            [111.895, -8.210],
+            [111.810, -8.210],
+            [111.815, -8.135]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-kauman",
+        "name": "Kecamatan Kauman",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.0580, 111.8450],
+        "color": "#004B87",
+        "villages_count": 13,
+        "description": "Sentra industri batik gajah mada dan perbatasan Trenggalek."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.810, -8.030],
+            [111.880, -8.030],
+            [111.880, -8.090],
+            [111.810, -8.090],
+            [111.810, -8.030]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-besuki",
+        "name": "Kecamatan Besuki",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.2450, 111.7820],
+        "color": "#004B87",
+        "villages_count": 10,
+        "description": "Gerbang bahari Pantai Popoh, Sidem, dan terowongan Niyama."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.730, -8.200],
+            [111.830, -8.200],
+            [111.825, -8.300],
+            [111.735, -8.300],
+            [111.730, -8.200]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-sendang",
+        "name": "Kecamatan Sendang",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-7.9620, 111.8200],
+        "color": "#004B87",
+        "villages_count": 11,
+        "description": "Kawasan dataran tinggi Gunung Wilis, sentra susu sapi perah dan teh."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.760, -7.910],
+            [111.870, -7.910],
+            [111.870, -8.010],
+            [111.760, -8.010],
+            [111.760, -7.910]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ta-gondang",
+        "name": "Kecamatan Gondang",
+        "city": "tulungagung",
+        "cityName": "Tulungagung",
+        "center": [-8.0250, 111.8320],
+        "color": "#004B87",
+        "villages_count": 20,
+        "description": "Sentra industri genteng dan batu bata merah."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.790, -7.990],
+            [111.870, -7.990],
+            [111.865, -8.055],
+            [111.790, -8.055],
+            [111.790, -7.990]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-kepanjenkidul",
+        "name": "Kecamatan Kepanjenkidul",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.0920, 112.1620],
+        "color": "#D90429",
+        "villages_count": 7,
+        "description": "Pusat Kota Blitar, Makam Bung Karno, dan Stadion Supriyadi."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.145, -8.075],
+            [112.180, -8.075],
+            [112.180, -8.105],
+            [112.145, -8.105],
+            [112.145, -8.075]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-sananwetan",
+        "name": "Kecamatan Sananwetan",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.1020, 112.1810],
+        "color": "#D90429",
+        "villages_count": 7,
+        "description": "Monumen Pemberontakan PETA, Istana Gebang, dan pusat budaya."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.165, -8.085],
+            [112.205, -8.085],
+            [112.205, -8.125],
+            [112.165, -8.125],
+            [112.165, -8.085]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-sukorejo",
+        "name": "Kecamatan Sukorejo",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.1050, 112.1480],
+        "color": "#D90429",
+        "villages_count": 7,
+        "description": "Stasiun Blitar, Pasar Legi, dan simpul transportasi barat."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.125, -8.085],
+            [112.165, -8.085],
+            [112.165, -8.130],
+            [112.125, -8.130],
+            [112.125, -8.085]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-kanigoro",
+        "name": "Kecamatan Kanigoro",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.1320, 112.2180],
+        "color": "#D90429",
+        "villages_count": 12,
+        "description": "Ibukota Pusat Pemerintahan Kabupaten Blitar Baru."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.180, -8.110],
+            [112.260, -8.110],
+            [112.260, -8.170],
+            [112.180, -8.170],
+            [112.180, -8.110]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-wlingi",
+        "name": "Kecamatan Wlingi",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.0850, 112.3180],
+        "color": "#D90429",
+        "villages_count": 9,
+        "description": "Kota transit timur, RSUD Ngudi Waluyo, dan perkebunan teh Sirah Kencong."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.270, -8.040],
+            [112.370, -8.040],
+            [112.370, -8.125],
+            [112.270, -8.125],
+            [112.270, -8.040]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-srengat",
+        "name": "Kecamatan Srengat",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.0620, 112.0620],
+        "color": "#D90429",
+        "villages_count": 16,
+        "description": "Pusat ekonomi barat Blitar, perlintasan Tulungagung dan Kediri."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.010, -8.020],
+            [112.100, -8.020],
+            [112.100, -8.100],
+            [112.010, -8.100],
+            [112.010, -8.020]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-garum",
+        "name": "Kecamatan Garum",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.0750, 112.2280],
+        "color": "#D90429",
+        "villages_count": 9,
+        "description": "Sentra peternakan ayam petelur dan jalur akses Candi Penataran."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.180, -8.040],
+            [112.260, -8.040],
+            [112.260, -8.110],
+            [112.180, -8.110],
+            [112.180, -8.040]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-sutojayan",
+        "name": "Kecamatan Sutojayan (Lodoyo)",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.1850, 112.2150],
+        "color": "#D90429",
+        "villages_count": 11,
+        "description": "Pusat tradisi Siraman Gong Kyai Pradah dan Bendungan Lodoyo."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.160, -8.150],
+            [112.260, -8.150],
+            [112.260, -8.240],
+            [112.160, -8.240],
+            [112.160, -8.150]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bl-nglegok",
+        "name": "Kecamatan Nglegok",
+        "city": "blitar",
+        "cityName": "Blitar",
+        "center": [-8.0120, 112.2020],
+        "color": "#D90429",
+        "villages_count": 11,
+        "description": "Kompleks Candi Penataran dan lereng selatan Gunung Kelud."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [112.150, -7.950],
+            [112.250, -7.950],
+            [112.250, -8.040],
+            [112.150, -8.040],
+            [112.150, -7.950]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-trenggalek",
+        "name": "Kecamatan Trenggalek (Kota)",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.0550, 111.7120],
+        "color": "#E5A900",
+        "villages_count": 13,
+        "description": "Pusat pemerintahan Pendopo Manggala Praja Nugraha dan Alun-Alun."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.680, -8.030],
+            [111.745, -8.030],
+            [111.745, -8.085],
+            [111.680, -8.085],
+            [111.680, -8.030]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-watulimo",
+        "name": "Kecamatan Watulimo",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.2650, 111.7280],
+        "color": "#E5A900",
+        "villages_count": 12,
+        "description": "Kawasan Teluk Prigi, Pantai Karanggongso, dan Goa Lowo terbesar se-Asia Tenggara."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.670, -8.210],
+            [111.790, -8.210],
+            [111.790, -8.330],
+            [111.670, -8.330],
+            [111.670, -8.210]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-durenan",
+        "name": "Kecamatan Durenan",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.0920, 111.7920],
+        "color": "#E5A900",
+        "villages_count": 14,
+        "description": "Gerbang timur Trenggalek, tradisi Kupatan massal dan persimpangan Tulungagung."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.750, -8.060],
+            [111.830, -8.060],
+            [111.830, -8.140],
+            [111.750, -8.140],
+            [111.750, -8.060]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-karangan",
+        "name": "Kecamatan Karangan",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.0880, 111.6680],
+        "color": "#E5A900",
+        "villages_count": 12,
+        "description": "Pusat industri keripik tempe khas Trenggalek dan perbukitan."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.630, -8.055],
+            [111.700, -8.055],
+            [111.700, -8.130],
+            [111.630, -8.130],
+            [111.630, -8.055]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-panggul",
+        "name": "Kecamatan Panggul",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.2420, 111.4550],
+        "color": "#E5A900",
+        "villages_count": 15,
+        "description": "Ujung barat pesisir Pacitan, konservasi penyu dan Pantai Pelang."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.380, -8.180],
+            [111.520, -8.180],
+            [111.520, -8.320],
+            [111.380, -8.320],
+            [111.380, -8.180]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-gandusari",
+        "name": "Kecamatan Gandusari",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.0820, 111.6320],
+        "color": "#E5A900",
+        "villages_count": 11,
+        "description": "Sentra pertanian agraris dan jalur alternatif Karangan-Kampak."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.590, -8.050],
+            [111.660, -8.050],
+            [111.660, -8.120],
+            [111.590, -8.120],
+            [111.590, -8.050]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-pogalan",
+        "name": "Kecamatan Pogalan",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.0650, 111.7580],
+        "color": "#E5A900",
+        "villages_count": 10,
+        "description": "Kawasan penyangga kota dan agrowisata lembah sungai Ngasinan."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.730, -8.040],
+            [111.790, -8.040],
+            [111.790, -8.100],
+            [111.730, -8.100],
+            [111.730, -8.040]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-tugu",
+        "name": "Kecamatan Tugu",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-8.0250, 111.6420],
+        "color": "#E5A900",
+        "villages_count": 15,
+        "description": "Lokasi Bendungan Tugu dan jalur perbatasan menuju Ponorogo."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.580, -7.980],
+            [111.680, -7.980],
+            [111.680, -8.060],
+            [111.580, -8.060],
+            [111.580, -7.980]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tg-bendungan",
+        "name": "Kecamatan Bendungan",
+        "city": "trenggalek",
+        "cityName": "Trenggalek",
+        "center": [-7.9750, 111.7050],
+        "color": "#E5A900",
+        "villages_count": 8,
+        "description": "Kawasan dataran tinggi agrowisata Dilem Wilis, cengkeh dan kopi."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.660, -7.920],
+            [111.750, -7.920],
+            [111.750, -8.020],
+            [111.660, -8.020],
+            [111.660, -7.920]
+          ]
+        ]
+      }
+    }
+  ]
+}

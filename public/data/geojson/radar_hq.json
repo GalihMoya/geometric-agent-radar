@@ -1,0 +1,68 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "hq-tulungagung",
+        "name": "Kantor Radar Tulungagung (HQ Utama)",
+        "city": "tulungagung",
+        "city_label": "Tulungagung",
+        "address": "Jl. I Gusti Ngurah Rai No. 34 / Jl. Jayeng Kusuma, Bago, Tulungagung",
+        "phone": "(0355) 321888",
+        "color": "#004B87",
+        "accent": "#0073E6",
+        "badge_class": "hq-badge-tulungagung",
+        "marker_class": "hq-marker-tulungagung",
+        "personnel": 12,
+        "description": "Kantor Pusat Biro Jawa Pos Radar Tulungagung. Pusat komando redaksi, percetakan, dan radar taktis regional."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [111.9071825, -8.059625]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "hq-blitar",
+        "name": "Kantor Radar Blitar",
+        "city": "blitar",
+        "city_label": "Blitar",
+        "address": "Jl. Mastrip No. 12 / Jl. Kenanga, Kepanjenkidul, Kota Blitar",
+        "phone": "(0342) 811234",
+        "color": "#D90429",
+        "accent": "#EF233C",
+        "badge_class": "hq-badge-blitar",
+        "marker_class": "hq-marker-blitar",
+        "personnel": 9,
+        "description": "Biro Radar Blitar. Pos liputan strategis Makam Bung Karno, sentra agro, dan dinamika Kota/Kabupaten Blitar."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.1789795, -8.0931251]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "hq-trenggalek",
+        "name": "Kantor Radar Trenggalek",
+        "city": "trenggalek",
+        "city_label": "Trenggalek",
+        "address": "Jl. Panglima Sudirman / Jl. Brigjen Soetran No. 05, Trenggalek",
+        "phone": "(0355) 791456",
+        "color": "#E5A900",
+        "accent": "#FFC107",
+        "badge_class": "hq-badge-trenggalek",
+        "marker_class": "hq-marker-trenggalek",
+        "personnel": 8,
+        "description": "Biro Radar Trenggalek. Pusat informasi pesisir selatan Prigi, pegunungan Menak Sopal, dan infrastruktur wilayah."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [111.70837, -8.0669383]
+      }
+    }
+  ]
+}

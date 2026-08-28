@@ -1,0 +1,787 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+:root {
+    /* Brand Theme - Jawa Pos Radar Tulungagung */
+    --radar-blue: #004B87;
+    --radar-blue-dark: #003366;
+    --radar-blue-deep: #002244;
+    --radar-blue-light: #0073E6;
+    --radar-blue-subtle: #EBF4FC;
+    
+    /* City Identity Colors */
+    --color-tulungagung: #004B87;
+    --color-tulungagung-light: #0073E6;
+    --color-tulungagung-bg: rgba(0, 75, 135, 0.12);
+    --color-tulungagung-border: #0073E6;
+    
+    --color-blitar: #D90429;
+    --color-blitar-light: #EF233C;
+    --color-blitar-bg: rgba(217, 4, 41, 0.12);
+    --color-blitar-border: #EF233C;
+    
+    --color-trenggalek: #E5A900;
+    --color-trenggalek-light: #FFC107;
+    --color-trenggalek-bg: rgba(229, 169, 0, 0.12);
+    --color-trenggalek-border: #FFC107;
+
+    /* Theme Neutrals & Accents */
+    --radar-bg: #F4F7FC;
+    --radar-card-bg: #FFFFFF;
+    --radar-card-border: #E2E8F0;
+    --radar-text: #1E293B;
+    --radar-text-muted: #64748B;
+    --radar-text-dark: #0F172A;
+    
+    /* Operational Status Colors */
+    --status-active: #10B981;
+    --status-patrol: #6366F1;
+    --status-alert: #EF4444;
+    --status-standby: #F59E0B;
+
+    /* Typography */
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--radar-bg);
+    color: var(--radar-text);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+}
+
+.font-heading {
+    font-family: var(--font-heading);
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+/* Radar Header Navbar */
+.radar-navbar {
+    background: linear-gradient(135deg, var(--radar-blue-deep) 0%, var(--radar-blue) 60%, var(--radar-blue-dark) 100%);
+    border-bottom: 3px solid var(--radar-blue-light);
+    box-shadow: 0 4px 20px rgba(0, 75, 135, 0.25);
+    z-index: 1020;
+}
+
+.radar-logo-badge {
+    background: #FFFFFF;
+    color: var(--radar-blue);
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.live-radar-pill {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+    border-radius: 50rem;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.live-dot-pulse {
+    width: 8px;
+    height: 8px;
+    background-color: #10B981;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: live-pulse 1.8s infinite;
+}
+
+@keyframes live-pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* Region Filter Tab Buttons */
+.city-filter-nav {
+    display: flex;
+    gap: 6px;
+    background: #FFFFFF;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid var(--radar-card-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.btn-city-tab {
+    flex: 1;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #F8FAFC;
+    color: var(--radar-text-muted);
+}
+
+.btn-city-tab:hover {
+    background: #EDF2F7;
+    color: var(--radar-text-dark);
+}
+
+.btn-city-tab.active[data-city="all"] {
+    background: var(--radar-blue);
+    color: #FFFFFF;
+    box-shadow: 0 3px 10px rgba(0, 75, 135, 0.35);
+}
+
+.btn-city-tab.active[data-city="tulungagung"] {
+    background: var(--radar-blue);
+    color: #FFFFFF;
+    border-color: var(--radar-blue-light);
+    box-shadow: 0 3px 10px rgba(0, 75, 135, 0.4);
+}
+
+.btn-city-tab.active[data-city="blitar"] {
+    background: var(--color-blitar);
+    color: #FFFFFF;
+    border-color: var(--color-blitar-light);
+    box-shadow: 0 3px 10px rgba(217, 4, 41, 0.4);
+}
+
+.btn-city-tab.active[data-city="trenggalek"] {
+    background: var(--color-trenggalek);
+    color: #1E293B;
+    border-color: var(--color-trenggalek-light);
+    box-shadow: 0 3px 10px rgba(229, 169, 0, 0.4);
+}
+
+/* Stat Cards */
+.stat-card {
+    background: var(--radar-card-bg);
+    border: 1px solid var(--radar-card-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 10px rgba(0, 75, 135, 0.05);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 75, 135, 0.1);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.stat-card.stat-all::before { background: var(--radar-blue); }
+.stat-card.stat-ta::before { background: var(--color-tulungagung-light); }
+.stat-card.stat-bl::before { background: var(--color-blitar); }
+.stat-card.stat-tg::before { background: var(--color-trenggalek); }
+.stat-card.stat-active::before { background: var(--status-active); }
+.stat-card.stat-signal::before { background: #06B6D4; }
+
+.stat-val {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--radar-text-dark);
+    line-height: 1.1;
+}
+
+/* Panels & Glass effects */
+.radar-panel {
+    background: var(--radar-card-bg);
+    border: 1px solid var(--radar-card-border);
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 75, 135, 0.06);
+}
+
+/* Leaflet Map Styling */
+#radar-map {
+    width: 100%;
+    height: calc(100vh - 235px);
+    min-height: 540px;
+    border-radius: 12px;
+    z-index: 1;
+    background: #E5EFF9;
+}
+
+/* Map HUD Overlays */
+.map-hud-overlay {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 75, 135, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    z-index: 1000;
+}
+
+.map-hud-control-btn {
+    background: #FFFFFF;
+    border: 1px solid var(--radar-card-border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--radar-blue-dark);
+    transition: all 0.2s ease;
+}
+
+.map-hud-control-btn:hover {
+    background: var(--radar-blue);
+    color: #FFFFFF;
+    border-color: var(--radar-blue);
+}
+
+/* HQ Pulsing Marker Styling */
+.radar-hq-marker-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.radar-hq-beacon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.35);
+    border: 2.5px solid #FFFFFF;
+    z-index: 5;
+    transition: transform 0.2s ease;
+}
+
+.radar-hq-marker-wrap:hover .radar-hq-beacon {
+    transform: scale(1.25);
+}
+
+.radar-hq-pulse {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: hq-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    z-index: 2;
+}
+
+.radar-hq-pulse-2 {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: hq-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite 0.7s;
+    z-index: 1;
+}
+
+@keyframes hq-ping {
+    0% {
+        transform: scale(0.35);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.9);
+        opacity: 0;
+    }
+}
+
+/* HQ Regional Themes */
+.hq-marker-tulungagung .radar-hq-beacon { background: linear-gradient(135deg, #0073E6, #004B87); }
+.hq-marker-tulungagung .radar-hq-pulse,
+.hq-marker-tulungagung .radar-hq-pulse-2 { border: 2px solid #0073E6; background: rgba(0, 115, 230, 0.15); }
+
+.hq-marker-blitar .radar-hq-beacon { background: linear-gradient(135deg, #EF233C, #D90429); }
+.hq-marker-blitar .radar-hq-pulse,
+.hq-marker-blitar .radar-hq-pulse-2 { border: 2px solid #EF233C; background: rgba(239, 35, 60, 0.15); }
+
+.hq-marker-trenggalek .radar-hq-beacon { background: linear-gradient(135deg, #FFC107, #E5A900); color: #1E293B; }
+.hq-marker-trenggalek .radar-hq-pulse,
+.hq-marker-trenggalek .radar-hq-pulse-2 { border: 2px solid #FFC107; background: rgba(255, 193, 7, 0.2); }
+
+/* Small Agent Marker Styling */
+.radar-agent-marker-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.radar-agent-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+    transition: transform 0.2s ease;
+}
+
+.radar-agent-marker-wrap:hover .radar-agent-dot {
+    transform: scale(1.35);
+}
+
+.radar-agent-wave {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    opacity: 0.6;
+    animation: agent-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes agent-ping {
+    0% { transform: scale(0.4); opacity: 0.9; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Agent Color Classes */
+.agent-marker-tulungagung { color: var(--color-tulungagung-light); }
+.agent-marker-tulungagung .radar-agent-dot { background-color: var(--color-tulungagung-light); }
+
+.agent-marker-blitar { color: var(--color-blitar); }
+.agent-marker-blitar .radar-agent-dot { background-color: var(--color-blitar); }
+
+.agent-marker-trenggalek { color: var(--color-trenggalek); }
+.agent-marker-trenggalek .radar-agent-dot { background-color: var(--color-trenggalek); }
+
+/* Permanent Agent / Kiosk Map Label Tooltips */
+.leaflet-tooltip.agent-map-label {
+    background: #FFFFFF !important;
+    border: 1.5px solid var(--radar-card-border) !important;
+    border-radius: 6px !important;
+    padding: 2px 7px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    font-family: var(--font-heading) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    color: var(--radar-text-dark) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease !important;
+    transform: none;
+}
+
+.leaflet-tooltip.agent-map-label:hover {
+    box-shadow: 0 4px 14px rgba(0, 75, 135, 0.3) !important;
+    z-index: 1000 !important;
+}
+
+.leaflet-tooltip.agent-map-label::before {
+    border-top-color: #FFFFFF !important;
+    pointer-events: none !important;
+}
+
+.leaflet-tooltip.agent-map-label-tulungagung {
+    border-color: var(--radar-blue-light) !important;
+    border-left: 3.5px solid var(--radar-blue) !important;
+}
+
+.leaflet-tooltip.agent-map-label-blitar {
+    border-color: var(--color-blitar) !important;
+    border-left: 3.5px solid var(--color-blitar) !important;
+}
+
+.leaflet-tooltip.agent-map-label-trenggalek {
+    border-color: var(--color-trenggalek) !important;
+    border-left: 3.5px solid var(--color-trenggalek) !important;
+}
+
+.agent-map-label-content {
+    pointer-events: none;
+}
+
+.agent-map-label-name {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--radar-text-dark);
+    pointer-events: none;
+}
+
+.district-hover-tooltip {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #FFFFFF !important;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.village-map-label {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #FFFFFF !important;
+    font-size: 0.68rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Custom Marker Cluster Styling */
+.marker-cluster-tulungagung {
+    background-color: rgba(0, 115, 230, 0.3) !important;
+}
+.marker-cluster-tulungagung div {
+    background-color: var(--radar-blue) !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+
+.marker-cluster-blitar {
+    background-color: rgba(217, 4, 41, 0.3) !important;
+}
+.marker-cluster-blitar div {
+    background-color: var(--color-blitar) !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+
+.marker-cluster-trenggalek {
+    background-color: rgba(229, 169, 0, 0.3) !important;
+}
+.marker-cluster-trenggalek div {
+    background-color: var(--color-trenggalek) !important;
+    color: #1E293B !important;
+    font-weight: 700;
+}
+
+/* Sidebar Agent List */
+.agent-card-item {
+    background: #FFFFFF;
+    border: 1px solid var(--radar-card-border);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.agent-card-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.agent-card-item[data-city="tulungagung"]::before { background: var(--color-tulungagung-light); }
+.agent-card-item[data-city="blitar"]::before { background: var(--color-blitar); }
+.agent-card-item[data-city="trenggalek"]::before { background: var(--color-trenggalek); }
+
+.agent-card-item:hover {
+    border-color: var(--radar-blue-light);
+    box-shadow: 0 4px 14px rgba(0, 75, 135, 0.12);
+    transform: translateX(3px);
+}
+
+.agent-card-item.selected {
+    background: #F0F7FF;
+    border-color: var(--radar-blue-light);
+    box-shadow: 0 4px 14px rgba(0, 115, 230, 0.2);
+}
+
+/* Badges & Status */
+.badge-city-tulungagung {
+    background: rgba(0, 75, 135, 0.12);
+    color: var(--radar-blue);
+    border: 1px solid rgba(0, 75, 135, 0.3);
+    font-weight: 600;
+}
+
+.badge-city-blitar {
+    background: rgba(217, 4, 41, 0.12);
+    color: var(--color-blitar);
+    border: 1px solid rgba(217, 4, 41, 0.3);
+    font-weight: 600;
+}
+
+.badge-city-trenggalek {
+    background: rgba(229, 169, 0, 0.15);
+    color: #996800;
+    border: 1px solid rgba(229, 169, 0, 0.4);
+    font-weight: 600;
+}
+
+.badge-status-active {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-status-patrol {
+    background: rgba(99, 102, 241, 0.12);
+    color: #4338CA;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.badge-status-alert {
+    background: rgba(239, 68, 68, 0.12);
+    color: #B91C1C;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-status-standby {
+    background: rgba(245, 158, 11, 0.12);
+    color: #B45309;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Agent Detail Modal Styling */
+.agent-modal-header {
+    background: linear-gradient(135deg, var(--radar-blue-deep) 0%, var(--radar-blue) 100%);
+    color: #FFFFFF;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 24px;
+}
+
+.agent-avatar-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    color: var(--radar-blue);
+    font-size: 24px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.agent-info-grid {
+    background: #F8FAFC;
+    border: 1px solid var(--radar-card-border);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--radar-blue-light);
+}
+
+/* ==========================================================================
+   Admin Console Styles & Utilities
+   ========================================================================== */
+.admin-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-body main {
+    flex: 1 0 auto;
+}
+
+.admin-body footer {
+    flex-shrink: 0;
+}
+
+.hover-primary:hover {
+    color: var(--radar-blue-light) !important;
+}
+
+.btn-xs {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.35rem;
+}
+
+.agent-table-avatar {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    letter-spacing: -0.02em;
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.85rem 0.75rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: var(--radar-blue-subtle) !important;
+}
+
+/* ==========================================================================
+   Responsive Multi-Device Layout (Mobile, Tablet, Desktop)
+   ========================================================================== */
+
+/* Mobile & Tablet Devices (< 992px) */
+@media (max-width: 991.98px) {
+    #radar-map {
+        height: 52vh;
+        min-height: 380px;
+    }
+
+    .city-filter-nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .city-filter-nav::-webkit-scrollbar {
+        height: 3px;
+    }
+
+    .btn-city-tab {
+        white-space: nowrap;
+        padding: 6px 12px;
+        font-size: 0.76rem;
+        flex: 0 0 auto;
+    }
+
+    .radar-panel-sidebar {
+        height: auto !important;
+        min-height: unset !important;
+    }
+
+    #agent-list-container {
+        max-height: 340px;
+    }
+
+    .map-hud-overlay {
+        padding: 6px 10px !important;
+    }
+
+    .map-hud-overlay .form-check-label {
+        font-size: 0.7rem !important;
+    }
+
+    .stat-card {
+        padding: 8px 10px;
+    }
+
+    .stat-val {
+        font-size: 1.25rem;
+    }
+}
+
+/* Very Small Mobile Screens (< 576px) */
+@media (max-width: 575.98px) {
+    #radar-map {
+        height: 48vh;
+        min-height: 330px;
+        border-radius: 8px;
+    }
+
+    .navbar-brand {
+        font-size: 0.85rem;
+    }
+
+    .live-radar-pill {
+        padding: 3px 8px;
+        font-size: 0.72rem;
+    }
+
+    .stat-card {
+        padding: 6px 4px;
+    }
+
+    .stat-val {
+        font-size: 1.1rem;
+    }
+
+    .agent-card-item {
+        padding: 10px;
+    }
+
+    .modal-body {
+        padding: 1rem !important;
+    }
+
+    .agent-avatar-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+
+    .agent-modal-header {
+        padding: 14px 16px;
+    }
+}
+
+/* Touch Device Target Sizing */
+@media (pointer: coarse) {
+    .btn-city-tab,
+    .map-hud-control-btn,
+    .agent-card-item,
+    .form-check-input,
+    .form-select-sm,
+    .btn-sm {
+        min-height: 38px;
+    }
+
+    .form-check-input {
+        width: 1.15em;
+        height: 1.15em;
+    }
+}
+
+
