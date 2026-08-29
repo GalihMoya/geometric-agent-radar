@@ -677,7 +677,7 @@ function initEventListeners() {
         // Auto-minimize saat pertama load di layar mobile (lebar < 576px)
         if (window.innerWidth < 576) {
             isLayerPanelMinimized = true;
-            layerCheckboxes.style.display = 'none';
+            layerCheckboxes.classList.add('d-none');
             iconMinimize.className = 'bi bi-plus-lg';
             btnMinimize.title = 'Tampilkan Layer Radar';
         }
@@ -686,11 +686,11 @@ function initEventListeners() {
             isLayerPanelMinimized = !isLayerPanelMinimized;
 
             if (isLayerPanelMinimized) {
-                layerCheckboxes.style.display = 'none';
+                layerCheckboxes.classList.add('d-none');
                 iconMinimize.className = 'bi bi-plus-lg';
                 btnMinimize.title = 'Tampilkan Layer Radar';
             } else {
-                layerCheckboxes.style.display = '';
+                layerCheckboxes.classList.remove('d-none');
                 iconMinimize.className = 'bi bi-dash-lg';
                 btnMinimize.title = 'Sembunyikan Layer Radar';
             }
