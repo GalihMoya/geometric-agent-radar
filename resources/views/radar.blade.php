@@ -47,10 +47,6 @@
                             <i class="bi bi-shield-lock-fill"></i> <span class="d-none d-md-inline">ADMIN CONSOLE</span>
                         </a>
                     @endif
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light font-heading d-flex align-items-center gap-1" title="Login Administrator">
-                        <i class="bi bi-person-lock"></i> <span class="d-none d-md-inline">ADMIN LOGIN</span>
-                    </a>
                 @endauth
             </div>
         </div>
@@ -188,11 +184,14 @@
                     <div id="radar-map"></div>
 
                     <!-- HUD Layer Switcher Controls (Top Right) -->
-                    <div class="position-absolute top-0 end-0 m-2 m-md-3 map-hud-overlay p-2 d-none d-sm-block">
-                        <div class="small font-heading fw-bold text-dark mb-1 d-flex align-items-center gap-1">
-                            <i class="bi bi-layers-fill text-primary"></i> LAYER RADAR
+                    <div class="position-absolute top-0 end-0 m-2 m-md-3 map-hud-overlay p-2" id="layer-radar-panel">
+                        <div class="small font-heading fw-bold text-dark mb-1 d-flex align-items-center justify-content-between gap-1">
+                            <span><i class="bi bi-layers-fill text-primary"></i> LAYER RADAR</span>
+                            <button id="btn-layer-toggle-minimize" class="btn btn-sm p-0 border-0 bg-transparent text-muted ms-2" title="Sembunyikan Layer Radar" style="line-height:1; font-size:0.85rem;">
+                                <i class="bi bi-dash-lg" id="icon-layer-minimize"></i>
+                            </button>
                         </div>
-                        <div class="d-flex flex-column gap-1">
+                        <div class="d-flex flex-column gap-1" id="layer-radar-checkboxes">
                             <div class="form-check form-check-inline m-0">
                                 <input class="form-check-input" type="checkbox" id="layer-toggle-hq" checked>
                                 <label class="form-check-label small font-sans" for="layer-toggle-hq">Kantor Cabang Radar</label>
@@ -200,14 +199,6 @@
                             <div class="form-check form-check-inline m-0">
                                 <input class="form-check-input" type="checkbox" id="layer-toggle-regions" checked>
                                 <label class="form-check-label small font-sans" for="layer-toggle-regions">Batas Wilayah</label>
-                            </div>
-                            <div class="form-check form-check-inline m-0">
-                                <input class="form-check-input" type="checkbox" id="layer-toggle-districts" checked>
-                                <label class="form-check-label small font-sans" for="layer-toggle-districts">Kecamatan</label>
-                            </div>
-                            <div class="form-check form-check-inline m-0">
-                                <input class="form-check-input" type="checkbox" id="layer-toggle-villages" checked>
-                                <label class="form-check-label small font-sans" for="layer-toggle-villages">Desa (Detail)</label>
                             </div>
                             <div class="form-check form-check-inline m-0">
                                 <input class="form-check-input" type="checkbox" id="layer-toggle-agents" checked>

@@ -16,16 +16,12 @@ L.Icon.Default.mergeOptions({
 let map = null;
 let hqLayerGroup = null;
 let regionBoundaryLayer = null;
-let districtLayerGroup = null;
-let villageLayerGroup = null;
 let agentClusterGroup = null;
 
 let agentMarkersMap = {};
 let currentAgents = [];
 let currentCityFilter = 'all';
 let rawGeoJsonRegions = null;
-let rawGeoJsonDistricts = null;
-let rawGeoJsonVillages = null;
 let rawHqData = [];
 
 // Mataraman Map Defaults & Precision Bounds
@@ -120,8 +116,7 @@ function initMap() {
         onEachFeature: onEachRegionFeature
     }).addTo(map);
 
-    districtLayerGroup = L.layerGroup().addTo(map);
-    villageLayerGroup = L.layerGroup().addTo(map);
+
     hqLayerGroup = L.layerGroup().addTo(map);
 
     // Marker cluster group for agents
@@ -134,8 +129,6 @@ function initMap() {
     });
     map.addLayer(agentClusterGroup);
 
-    // Adaptive zoom level listener
-    map.on('zoomend', handleMapZoomLevels);
 }
 
 /**
@@ -180,23 +173,7 @@ async function loadSpatialData() {
             console.warn('Could not load mataraman_regions.json, using fallback');
         }
 
-        // Load Districts GeoJSON
-        try {
-            const resDistricts = await window.axios.get('/data/geojson/districts.json');
-            rawGeoJsonDistricts = resDistricts.data;
-            renderDistricts(rawGeoJsonDistricts);
-        } catch (e) {
-            console.warn('Could not load districts.json');
-        }
 
-        // Load Villages GeoJSON
-        try {
-            const resVillages = await window.axios.get('/data/geojson/villages.json');
-            rawGeoJsonVillages = resVillages.data;
-            renderVillages(rawGeoJsonVillages);
-        } catch (e) {
-            console.warn('Could not load villages.json');
-        }
 
         // Load HQ Locations
         try {
@@ -263,89 +240,7 @@ function onEachRegionFeature(feature, layer) {
     });
 }
 
-/**
- * Render Districts Layer
- */
-function renderDistricts(geoJsonData) {
-    if (!geoJsonData || !geoJsonData.features) return;
-    districtLayerGroup.clearLayers();
 
-    geoJsonData.features.forEach(feature => {
-        const props = feature.properties;
-        const cityId = props.city || 'tulungagung';
-        const colorInfo = REGION_COLORS[cityId] || REGION_COLORS.tulungagung;
-
-        const polygon = L.geoJSON(feature, {
-            style: {
-                fillColor: colorInfo.light,
-                weight: 1.5,
-                opacity: 0.8,
-                color: colorInfo.border,
-                fillOpacity: 0.08
-            }
-        });
-
-        polygon.bindTooltip(`<strong>${props.name}</strong><br><small class="opacity-75">${props.villages_count || 12} Desa/Kelurahan</small>`, {
-            className: `district-hover-tooltip district-hover-tooltip-${cityId}`,
-            sticky: true
-        });
-
-        polygon.on('click', () => {
-            map.flyTo(props.center, 13, { duration: 1.2 });
-            showVillagesInDistrict(props.id);
-        });
-
-        districtLayerGroup.addLayer(polygon);
-    });
-}
-
-/**
- * Render Villages Layer
- */
-function renderVillages(geoJsonData) {
-    if (!geoJsonData || !geoJsonData.features) return;
-    villageLayerGroup.clearLayers();
-
-    geoJsonData.features.forEach(feature => {
-        const props = feature.properties;
-        const cityId = props.city || 'tulungagung';
-        const colorInfo = REGION_COLORS[cityId] || REGION_COLORS.tulungagung;
-
-        const polygon = L.geoJSON(feature, {
-            style: {
-                fillColor: colorInfo.light,
-                weight: 1.5,
-                opacity: 0.9,
-                color: colorInfo.primary,
-                fillOpacity: 0.25
-            }
-        });
-
-        polygon.bindTooltip(`<strong>${props.name}</strong> (${props.district})`, {
-            className: 'village-map-label',
-            sticky: true
-        });
-
-        polygon.on('click', () => {
-            map.fitBounds(polygon.getBounds().pad(0.2));
-        });
-
-        villageLayerGroup.addLayer(polygon);
-    });
-}
-
-/**
- * Zoom into district and highlight relevant villages
- */
-function showVillagesInDistrict(districtId) {
-    if (!rawGeoJsonVillages) return;
-
-    const matchingVillages = rawGeoJsonVillages.features.filter(f => f.properties.district_id === districtId);
-    if (matchingVillages.length > 0) {
-        const tempGroup = L.featureGroup(matchingVillages.map(f => L.geoJSON(f)));
-        map.fitBounds(tempGroup.getBounds().pad(0.3));
-    }
-}
 
 /**
  * Render 3 Radar Headquarters (HQ) Landmarks
@@ -696,22 +591,7 @@ function openAgentDetailModal(agent) {
     modal.show();
 }
 
-/**
- * Handle Map Zoom Levels
- */
-function handleMapZoomLevels() {
-    if (!map) return;
-    const currentZoom = map.getZoom();
 
-    const toggleVillages = document.getElementById('layer-toggle-villages');
-    if (toggleVillages && !toggleVillages.checked) {
-        if (currentZoom >= 13) {
-            if (!map.hasLayer(villageLayerGroup)) map.addLayer(villageLayerGroup);
-        } else {
-            if (map.hasLayer(villageLayerGroup)) map.removeLayer(villageLayerGroup);
-        }
-    }
-}
 
 /**
  * Event Listeners Initialization
@@ -770,8 +650,6 @@ function initEventListeners() {
     // HUD Layer Switchers
     setupLayerToggle('layer-toggle-hq', hqLayerGroup);
     setupLayerToggle('layer-toggle-regions', regionBoundaryLayer);
-    setupLayerToggle('layer-toggle-districts', districtLayerGroup);
-    setupLayerToggle('layer-toggle-villages', villageLayerGroup);
     setupLayerToggle('layer-toggle-agents', agentClusterGroup);
 
     // Responsive Map Viewport Invalidation on Resize / Orientation Change
@@ -788,6 +666,36 @@ function initEventListeners() {
             }
         }, 200);
     });
+
+    // Mobile Layer Panel Minimize/Maximize
+    const btnMinimize = document.getElementById('btn-layer-toggle-minimize');
+    const layerCheckboxes = document.getElementById('layer-radar-checkboxes');
+    const iconMinimize = document.getElementById('icon-layer-minimize');
+    let isLayerPanelMinimized = false;
+
+    if (btnMinimize && layerCheckboxes && iconMinimize) {
+        // Auto-minimize saat pertama load di layar mobile (lebar < 576px)
+        if (window.innerWidth < 576) {
+            isLayerPanelMinimized = true;
+            layerCheckboxes.style.display = 'none';
+            iconMinimize.className = 'bi bi-plus-lg';
+            btnMinimize.title = 'Tampilkan Layer Radar';
+        }
+
+        btnMinimize.addEventListener('click', () => {
+            isLayerPanelMinimized = !isLayerPanelMinimized;
+
+            if (isLayerPanelMinimized) {
+                layerCheckboxes.style.display = 'none';
+                iconMinimize.className = 'bi bi-plus-lg';
+                btnMinimize.title = 'Tampilkan Layer Radar';
+            } else {
+                layerCheckboxes.style.display = '';
+                iconMinimize.className = 'bi bi-dash-lg';
+                btnMinimize.title = 'Sembunyikan Layer Radar';
+            }
+        });
+    }
 }
 
 /**
