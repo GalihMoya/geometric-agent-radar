@@ -173,7 +173,7 @@
                         <!-- Nama Kios & Pemilik -->
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-3">
-                                <div class="agent-table-avatar rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm"
+                                <div class="agent-table-avatar rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm flex-shrink-0"
                                      style="width: 38px; height: 38px; background: {{ $kodeCabang == 'tulungagung' ? 'var(--color-tulungagung)' : ($kodeCabang == 'blitar' ? 'var(--color-blitar)' : 'var(--color-trenggalek)') }};">
                                     {{ strtoupper(substr($agent->nama_agen, 0, 2)) }}
                                 </div>
