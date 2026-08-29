@@ -727,7 +727,7 @@ body {
 @media (max-width: 575.98px) {
     #radar-map {
         height: 48vh;
-        min-height: 330px;
+        min-height: 260px;
         border-radius: 8px;
     }
 
@@ -764,6 +764,10 @@ body {
 
     .agent-modal-header {
         padding: 14px 16px;
+    }
+
+    #layer-radar-panel {
+        max-width: 180px;
     }
 }
 
