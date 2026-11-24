@@ -1,0 +1,11 @@
+buatkan issue.md baru untuk plan perubahan baru yang akan di implementasikan di bawah :
+
+list plan perubahan :
+1. tambahkan fitur titik lokasi pemakai untuk non user maupun user
+    - fitur ini berfungsi untuk mengetahui lokasi dari pemakai (nonuser/user)
+    - dari fitur ini juga nantinya terdapat fitur lagi yang bisa mencari jarak terdekat dari titik pemakai ke titik lokasi agen maupun cabang
+2. tambahkan fitur pencarian jarak terdekat dari titik pemakai ke agen koran maupun cabang yang dipilih.
+3. tambahkan fitur pencarian agen terdekat berdasarkan lokasi titik pemakai
+
+jelaskan tahapan planing perubahan di atas untuk di kerjakan oleh junior programmer atau model AI yang lebih murah.
+jelaskan secara rinci agar tidak miss informasi dan lakukan perintah debug agar tidak mengalami eror

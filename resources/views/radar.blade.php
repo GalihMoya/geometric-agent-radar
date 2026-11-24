@@ -35,6 +35,9 @@
                 <div id="radar-live-indicator" class="live-radar-pill font-mono">
                     <span class="live-dot-pulse"></span> LIVE RADAR
                 </div>
+                <button id="btn-user-location" class="btn btn-sm btn-light text-primary font-heading fw-semibold d-flex align-items-center gap-1 shadow-sm" title="Deteksi Lokasi Saya Saat Ini">
+                    <i class="bi bi-crosshair text-primary" id="icon-user-location"></i> <span class="d-none d-md-inline" id="text-user-location">LOKASI SAYA</span>
+                </button>
                 <button id="btn-reset-map" class="btn btn-sm btn-light text-primary font-heading fw-semibold d-flex align-items-center gap-1 shadow-sm" title="Pusatkan Peta ke Mataraman">
                     <i class="bi bi-geo-alt-fill text-danger"></i> <span class="d-none d-md-inline">MATARAMAN VIEW</span>
                 </button>
@@ -159,6 +162,66 @@
                                 </select>
                             </div>
                         </div>
+
+                        <!-- Kontrol Proximity / Jarak Pemakai -->
+                        <div id="user-proximity-wrapper" class="mt-2">
+                            <!-- Prompt ketika lokasi belum aktif -->
+                            <div id="user-location-prompt" class="p-2 rounded bg-light border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="small font-heading fw-bold text-dark" style="font-size: 0.72rem;">
+                                        <i class="bi bi-geo-alt-fill text-primary me-1"></i>PENCARIAN TERDEKAT
+                                    </span>
+                                    <span class="badge bg-secondary font-mono" style="font-size: 0.62rem;">LOKASI OFF</span>
+                                </div>
+                                <p class="text-muted small mb-2" style="font-size: 0.70rem; line-height: 1.3;">
+                                    Aktifkan lokasi untuk mengukur jarak & mencari kios koran terdekat dari posisi Anda.
+                                </p>
+                                <div class="d-grid gap-1">
+                                    <button type="button" id="btn-prompt-detect-loc" class="btn btn-sm btn-outline-primary font-heading fw-semibold py-1" style="font-size: 0.74rem;">
+                                        <i class="bi bi-crosshair me-1"></i> Deteksi Lokasi GPS
+                                    </button>
+                                    <button type="button" id="btn-pick-location-map" class="btn btn-sm btn-light border text-secondary font-heading py-1" style="font-size: 0.72rem;">
+                                        <i class="bi bi-cursor-fill me-1 text-primary"></i> Tentukan Titik di Peta
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Panel kontrol ketika lokasi sudah aktif -->
+                            <div id="user-proximity-controls" class="p-2 rounded bg-light border d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold text-primary font-heading" style="font-size: 0.73rem;">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>JARAK DARI ANDA:
+                                    </small>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span id="user-distance-status" class="badge bg-success font-mono" style="font-size: 0.65rem;">GPS AKTIF</span>
+                                        <button type="button" id="btn-clear-user-location" class="btn btn-sm p-0 text-muted border-0" title="Hapus / Reset Titik Lokasi" style="line-height:1; font-size:0.8rem;">
+                                            <i class="bi bi-x-circle text-danger"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row g-1 mb-1">
+                                    <div class="col-7">
+                                        <select id="filter-radius" class="form-select form-select-sm font-sans" style="font-size: 0.75rem;">
+                                            <option value="all" selected>Semua Jarak</option>
+                                            <option value="1000">&lt; 1 KM</option>
+                                            <option value="3000">&lt; 3 KM</option>
+                                            <option value="5000">&lt; 5 KM</option>
+                                            <option value="10000">&lt; 10 KM</option>
+                                            <option value="20000">&lt; 20 KM</option>
+                                            <option value="35000">&lt; 35 KM</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-5">
+                                        <button type="button" id="btn-sort-nearest" class="btn btn-sm btn-primary text-white w-100 font-sans fw-semibold" style="font-size: 0.75rem;" title="Urutkan dari yang paling dekat">
+                                            <i class="bi bi-sort-numeric-down"></i> Terdekat
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-find-closest-agent" class="btn btn-sm btn-success w-100 font-heading fw-bold py-1 mt-1 shadow-sm d-flex align-items-center justify-content-center gap-1" style="font-size: 0.74rem;">
+                                    <i class="bi bi-compass-fill"></i> TEMUKAN KIOS TERDEKAT
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="my-2" style="border-color: var(--radar-card-border);">
@@ -182,6 +245,15 @@
             <div class="col-12 col-lg-8 col-xl-9">
                 <div class="radar-panel p-2 position-relative">
                     <div id="radar-map"></div>
+
+                    <!-- Map Location Picking Helper Banner -->
+                    <div id="map-pick-banner" class="position-absolute top-0 start-50 translate-middle-x m-2 px-3 py-2 bg-dark text-white rounded-pill shadow-lg small font-sans d-none d-flex align-items-center gap-2 border border-primary" style="z-index: 1000;">
+                        <span class="live-dot-pulse bg-warning"></span>
+                        <span>Klik pada peta untuk menempatkan titik lokasi Anda</span>
+                        <button type="button" class="btn btn-sm text-white-50 hover-white p-0 border-0 ms-1" id="btn-cancel-pick-location" title="Batalkan">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </button>
+                    </div>
 
                     <!-- HUD Layer Switcher Controls (Top Right) -->
                     <div class="position-absolute top-0 end-0 m-2 m-md-3 map-hud-overlay p-2" id="layer-radar-panel">
@@ -312,6 +384,22 @@
                                 </a>
                             </div>
                         </div>
+                        <div class="col-12" id="modal-agent-distance-container">
+                            <div id="modal-agent-distance-box-active" class="p-2 border rounded bg-info-subtle border-info text-info-emphasis d-none align-items-center justify-content-between">
+                                <span class="small font-sans">
+                                    <i class="bi bi-compass-fill me-1 text-primary"></i><strong>Jarak dari Lokasi Anda:</strong>
+                                </span>
+                                <span id="modal-agent-distance-val" class="font-mono fw-bold text-primary fs-6">-</span>
+                            </div>
+                            <div id="modal-agent-distance-box-prompt" class="p-2 border rounded bg-light text-muted d-flex align-items-center justify-content-between">
+                                <span class="small font-sans text-muted">
+                                    <i class="bi bi-geo-alt me-1 text-secondary"></i>Jarak belum dihitung (lokasi nonaktif)
+                                </span>
+                                <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-sans fw-semibold btn-modal-trigger-detect" style="font-size: 0.72rem;">
+                                    Deteksi Lokasi
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -357,6 +445,22 @@
                                 <span class="text-muted d-block">Telepon Kantor:</span>
                                 <strong id="modal-hq-phone" class="text-primary">(0355) 321888</strong>
                             </div>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="modal-hq-distance-container">
+                        <div id="modal-hq-distance-box-active" class="p-2 border rounded bg-info-subtle border-info text-info-emphasis d-none align-items-center justify-content-between">
+                            <span class="small font-sans">
+                                <i class="bi bi-compass-fill me-1 text-primary"></i><strong>Jarak dari Lokasi Anda:</strong>
+                            </span>
+                            <span id="modal-hq-distance-val" class="font-mono fw-bold text-primary fs-6">-</span>
+                        </div>
+                        <div id="modal-hq-distance-box-prompt" class="p-2 border rounded bg-light text-muted d-flex align-items-center justify-content-between">
+                            <span class="small font-sans text-muted">
+                                <i class="bi bi-geo-alt me-1 text-secondary"></i>Jarak belum dihitung (lokasi nonaktif)
+                            </span>
+                            <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 font-sans fw-semibold btn-modal-trigger-detect" style="font-size: 0.72rem;">
+                                Deteksi Lokasi
+                            </button>
                         </div>
                     </div>
                     <p id="modal-hq-desc" class="text-muted small mb-0"></p>

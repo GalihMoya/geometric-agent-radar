@@ -788,4 +788,105 @@ body {
     }
 }
 
+/* ==========================================================================
+   User Location Marker & Proximity Styling
+   ========================================================================== */
+
+.user-location-marker-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-beacon-wrap {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-beacon-dot {
+    width: 16px;
+    height: 16px;
+    background-color: #0073E6;
+    border: 3px solid #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0, 115, 230, 0.7);
+    z-index: 3;
+    transition: transform 0.2s ease;
+}
+
+.user-beacon-wrap:hover .user-beacon-dot {
+    transform: scale(1.3);
+}
+
+.user-beacon-pulse {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(0, 115, 230, 0.4);
+    animation: user-radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    z-index: 1;
+}
+
+@keyframes user-radar-ping {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(2.4);
+        opacity: 0;
+    }
+}
+
+/* Badge Jarak di Kartu Agen Sidebar */
+.badge-distance-pill {
+    background-color: #EBF4FC;
+    color: #004B87;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    padding: 3px 8px;
+    border-radius: 50rem;
+    border: 1px solid #BAE0FD;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-weight: 600;
+}
+
+.badge-distance-pill i {
+    font-size: 0.75rem;
+}
+
+/* Map Location Picking Mode */
+.map-picking-cursor,
+.map-picking-cursor .leaflet-grab,
+.map-picking-cursor .leaflet-interactive {
+    cursor: crosshair !important;
+}
+
+.hover-white:hover {
+    color: #FFFFFF !important;
+}
+
+#map-pick-banner {
+    animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -12px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+
 
